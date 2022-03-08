@@ -9,6 +9,7 @@ import frc.robot.subsystems.Climber;
 
 public class ClimbArmDown extends CommandBase {
   private Climber m_climber;
+  boolean armsDown;
   /** Creates a new Climb. */
   public ClimbArmDown(Climber climber) {
     m_climber = climber;
@@ -17,27 +18,33 @@ public class ClimbArmDown extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
+  //true limit switches means they are not pressed
   @Override
   public void execute() {
     if (m_climber.getLimitSwitchRightDown() && m_climber.getLimitSwitchLeftDown()){
-      m_climber.runClimber(0);
-      end(true);
+      m_climber.runClimber(1);
     }
     else{
-      m_climber.runClimber(-.1);
+      m_climber.runClimber(0);
+      m_climber.climbEncoderReset();
+      armsDown = true; // end
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return armsDown;
   }
 }

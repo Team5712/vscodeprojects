@@ -9,6 +9,7 @@ import frc.robot.subsystems.Climber;
 
 public class ClimbArmForward extends CommandBase {
   private Climber m_climber;
+  Boolean armsOut = false;
   /** Creates a new Climb. */
   public ClimbArmForward(Climber climber) {
     m_climber = climber;
@@ -23,6 +24,7 @@ public class ClimbArmForward extends CommandBase {
   @Override
   public void execute() {
     m_climber.moveSolenoid(true);
+    armsOut = true;
   }
 
   // Called once the command ends or is interrupted.
@@ -32,6 +34,6 @@ public class ClimbArmForward extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return armsOut;
   }
 }

@@ -30,9 +30,9 @@ public class ReverseIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.moveIntake(.4);
-    m_magazine.runLowerMag(-0.5);
-    m_magazine.runUpperMag(0.5);
+    m_intake.moveIntake(1);
+    m_magazine.runLowerMag(-1);
+    m_magazine.runUpperMag(.3);
     m_shooter.reverseShooter();
   }
 

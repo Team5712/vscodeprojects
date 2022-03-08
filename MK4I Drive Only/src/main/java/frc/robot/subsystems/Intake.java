@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
   
   CANSparkMax intake = new CANSparkMax(18, com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless);
-  Solenoid intakeSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
+  Solenoid intakeSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
   
   /** Creates a new Intake. */
   public Intake() {

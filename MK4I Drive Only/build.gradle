@@ -1,6 +1,8 @@
+
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2022.2.1"
+
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -65,7 +67,14 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+
     testImplementation 'junit:junit:4.12'
+}
+repositories {
+    mavenLocal()
+    mavenCentral()
 }
 
 // Simulation configuration (e.g. environment variables).

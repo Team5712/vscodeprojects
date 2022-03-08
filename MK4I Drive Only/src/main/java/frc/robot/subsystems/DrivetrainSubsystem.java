@@ -10,15 +10,19 @@ import com.swervedrivespecialties.swervelib.Mk3SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 import static frc.robot.Constants.*;
 
@@ -40,9 +44,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * <p>
    * This is a measure of how fast the robot should be able to drive in a straight line.
    */
+
   public static final double MAX_VELOCITY_METERS_PER_SECOND = 6380.0 / 60.0 *
           SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
           SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+          
   /**
    * The maximum angular velocity of the robot in radians per second.
    * <p>
@@ -62,6 +68,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
           // Back right
           new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0)
   );
+
+  
+private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
+        new Rotation2d(-getGyroscopeRotation().getDegrees()), Constants.auto.startingPos.DEFAULT_POS);
 
   // By default we use a Pigeon for our gyroscope. But if you use another gyroscope, like a NavX, you can change this.
   // The important thing about how you configure your gyroscope is that rotating the robot counter-clockwise should
@@ -162,6 +172,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void zeroGyroscope() {
     // FIXME Remove if you are using a Pigeon
     m_pigeon.setYaw(0.0);
+    
 
     // FIXME Uncomment if you are using a NavX
 //    m_navx.zeroYaw();
@@ -183,16 +194,51 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   public void drive(ChassisSpeeds chassisSpeeds) {
     m_chassisSpeeds = chassisSpeeds;
+    SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
+    setAllStates(states);
   }
 
   @Override
   public void periodic() {
-    SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
+    
 
-    m_frontLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[0].angle.getRadians());
-    m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[1].angle.getRadians());
-    m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[2].angle.getRadians());
-    m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[3].angle.getRadians());
+    
+
+    //System.out.println(Rotation2d.fromDegrees(m_pigeon.getPitch()));
+
+    
   }
+    public void updateOdometry(SwerveModuleState[] states) {
+                m_odometry.update(Rotation2d.fromDegrees(getGyroscopeRotation().getDegrees()), states[0], states[1],
+                                states[2], states[3]);
+        }
+
+        public void setAllStates(SwerveModuleState[] states){
+                m_frontLeftModule.set(states[0].speedMetersPerSecond / swerve.MAX_VEL_METERS * swerve.MAX_VOLTAGE,
+                states[0].angle.getRadians());
+m_frontRightModule.set(states[1].speedMetersPerSecond / swerve.MAX_VEL_METERS * swerve.MAX_VOLTAGE,
+                states[1].angle.getRadians());
+m_backLeftModule.set(-states[2].speedMetersPerSecond / swerve.MAX_VEL_METERS * swerve.MAX_VOLTAGE,
+                states[2].angle.getRadians());
+m_backRightModule.set(states[3].speedMetersPerSecond / swerve.MAX_VEL_METERS * swerve.MAX_VOLTAGE,
+                states[3].angle.getRadians());
+                updateOdometry(states);
+                
+        }
+        
+        public Pose2d getPose2d() {
+                return m_odometry.getPoseMeters();
+        }
+        public Pigeon2 getGyroscopeObj(){
+                return m_pigeon;
+        }
+        public SwerveDriveKinematics getKinematics() {
+                return m_kinematics;
+}
+public void resetOdometry(Pose2d resetPos){
+        m_odometry.resetPosition(resetPos, resetPos.getRotation());
+}
+
+        
 }

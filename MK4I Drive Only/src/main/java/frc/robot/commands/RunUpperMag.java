@@ -25,7 +25,7 @@ public class RunUpperMag extends CommandBase {
   @Override
   public void execute() {
     m_magazine.getUpperBallSensor();
-    //m_magazine.runUpperMag(-.5);
+    m_magazine.runUpperMag(-.5);
   }
 
   // Called once the command ends or is interrupted.

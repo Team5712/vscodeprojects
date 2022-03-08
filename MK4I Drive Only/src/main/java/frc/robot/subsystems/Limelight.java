@@ -26,6 +26,9 @@ public class Limelight extends SubsystemBase {
   double valid = tv.getDouble(0.0);
   double shortside = tshort.getDouble(0.0);
   double longside = tlong.getDouble(0.0);
+  double kP = .03;
+  double output;
+  Boolean targetingOn = false;
 
   public Limelight() {
   }
@@ -34,7 +37,7 @@ public class Limelight extends SubsystemBase {
     return y;
   }
   public double getX(){
-    return x;
+    return tx.getDouble(0.0);
   }
   public double ifValidTarget(){
     return valid;
@@ -46,6 +49,37 @@ public class Limelight extends SubsystemBase {
     return longside;
   }
   
+  public void targetToggle(boolean onOff) {
+    targetingOn = onOff;
+  }
+
+  public double turnToTarget() {
+    //double x = getX();
+    //System.out.println(getX());
+    if (targetingOn) {
+      System.out.println(getX());
+      if (getX() > 1){
+        if (getX() < 1){
+          output = -.04 * getX();
+        }
+        else{
+          output = -.02 * getX();
+        }  
+      } 
+      if (getX() < -1){
+        if (getX() < -5){
+          output = -.04 * getX();
+        }
+        else{
+          output = -.02 * getX();
+        }  
+      } 
+      return output;
+    }
+    else {
+      return 0;
+    }
+  }
 
   @Override
   public void periodic() {

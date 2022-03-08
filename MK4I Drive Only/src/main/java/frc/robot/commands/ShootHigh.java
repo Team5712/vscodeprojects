@@ -5,16 +5,19 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Magazine;
 import frc.robot.subsystems.Shooter;
 
 public class ShootHigh extends CommandBase {
   /** Creates a new ShootHigh. */
 
   private Shooter m_shooter;
+  private Magazine m_magazine;
 
-  public ShootHigh(Shooter shooter) {
+  public ShootHigh(Shooter shooter, Magazine magazine) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
+    m_magazine = magazine;
   }
 
   // Called when the command is initially scheduled.
@@ -25,6 +28,13 @@ public class ShootHigh extends CommandBase {
   @Override
   public void execute() {
     m_shooter.shootHigh();
+    // System.out.println(m_shooter.getShooterError());
+    // if (m_shooter.getShooterError() < 100) {
+    //   System.out.println(m_shooter.getShooterError());
+    //   m_magazine.runLowerMag(.3);
+    //   m_magazine.runUpperMag(-.3);
+    // }
+    
   }
 
   // Called once the command ends or is interrupted.

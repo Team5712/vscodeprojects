@@ -24,7 +24,7 @@ public class RunLowerMag extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //m_magazine.runLowerMag(.5);
+    m_magazine.runLowerMag(.5);
     System.out.println("UPPER BALL SENSOR" + m_magazine.getLowerBallSensor());
   }
 

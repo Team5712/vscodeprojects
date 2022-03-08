@@ -32,23 +32,29 @@ public class PickUpBall extends CommandBase {
     // m_intake.moveIntake(-.4);
     // m_magazine.runLowerMag(0.7);
     // m_magazine.runUpperMag(-.7);
-
-    //System.out.println("BALL SENSOR VALUE:     " + Constants.UPPER_BALL_SENSOR_THRESHOLD);
+    // high no ball is ~250, with ball ~1100
+    System.out.println("BALL SENSOR VALUE:     " + m_magazine.getUpperBallSensor());
+    System.out.println("LOWER BALL SENSOR VALUE:     " + m_magazine.getLowerBallSensor());
     if (m_magazine.getUpperBallSensor() < Constants.UPPER_BALL_SENSOR_THRESHOLD) {
       m_intake.moveIntake(-.4);
-      m_magazine.runLowerMag(0.5);
-      m_magazine.runUpperMag(-.5);
+      m_magazine.runLowerMag(0.4);
+      m_magazine.runUpperMag(-.2);
     } 
-    if (m_magazine.getUpperBallSensor() > Constants.UPPER_BALL_SENSOR_THRESHOLD) {
-      m_intake.moveIntake(-.4);
-      m_magazine.runLowerMag(0.5);
-      m_magazine.runUpperMag(0);
+    else if (m_magazine.getUpperBallSensor() > Constants.UPPER_BALL_SENSOR_THRESHOLD) {
+
+      if (m_magazine.getLowerBallSensor() < Constants.LOWER_BALL_SENSOR_THRESHOLD) {
+        m_intake.moveIntake(0);
+        m_magazine.runLowerMag(0);
+        m_magazine.runUpperMag(0);
+      }
+      else if (m_magazine.getLowerBallSensor() > Constants.LOWER_BALL_SENSOR_THRESHOLD) {
+          m_intake.moveIntake(-.4);
+          m_magazine.runLowerMag(0.4);
+          m_magazine.runUpperMag(0);
+        } 
     } 
-    if (m_magazine.getUpperBallSensor() > Constants.UPPER_BALL_SENSOR_THRESHOLD && m_magazine.getLowerBallSensor() > Constants.LOWER_BALL_SENSOR_THRESHOLD) {
-      m_intake.moveIntake(-.4);
-      m_magazine.runLowerMag(0.5);
-      m_magazine.runUpperMag(0);
-    } 
+    
+    
 
   }
 

@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -21,6 +22,8 @@ public class Shooter extends SubsystemBase {
   TalonFX leftShooter = new TalonFX(19);
   TalonFX rightShooter = new TalonFX(20);
   CANSparkMax hood = new CANSparkMax(21, com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless);
+  SparkMaxLimitSwitch backLimitSwitch = hood.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);//back
+  SparkMaxLimitSwitch forwardLimitSwitch = hood.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);//forward
 
   /** Creates a new Shooter. */
   public Shooter() {
@@ -48,16 +51,6 @@ public class Shooter extends SubsystemBase {
   }
 
   
-  public boolean ifTriggerPress(XboxController controller) {
-    if (controller.getRawAxis(3) > 0){
-      return true;
-    }
-    else{
-      return false;
-    }
-
-  }
-
   public void shootHigh() {
     leftShooter.config_kP(0, Constants.SHOOTING_Kp, 30);
     leftShooter.config_kI(0, Constants.SHOOTING_Ki, 30);
@@ -111,8 +104,19 @@ public class Shooter extends SubsystemBase {
     
   }
 
+  public boolean isBackLimitSwitchTriggered(){
+    return backLimitSwitch.isPressed();
+  }
+  public boolean isForwardLimitSwitchTriggered(){
+    return forwardLimitSwitch.isPressed();
+  }
+
   public void moveHood(double power) {
     hood.set(power);
+  }
+
+  public void zeroEncoderOfHood(){
+    hood.getEncoder().setPosition(0);
   }
 
   public void reverseShooter() {
