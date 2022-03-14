@@ -69,16 +69,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
           new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0)
   );
 
-  
+  private final Pigeon2 m_pigeon = new Pigeon2(DRIVETRAIN_PIGEON_ID);
 private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
-        new Rotation2d(-getGyroscopeRotation().getDegrees()), Constants.auto.startingPos.DEFAULT_POS);
+        new Rotation2d(0));
+       
 
   // By default we use a Pigeon for our gyroscope. But if you use another gyroscope, like a NavX, you can change this.
   // The important thing about how you configure your gyroscope is that rotating the robot counter-clockwise should
   // cause the angle reading to increase until it wraps back over to zero.
   // FIXME Remove if you are using a Pigeon
   //private final PigeonIMU m_pigeon = new PigeonIMU(DRIVETRAIN_PIGEON_ID);
-  private final Pigeon2 m_pigeon = new Pigeon2(DRIVETRAIN_PIGEON_ID);
+  //private final Pigeon2 m_pigeon = new Pigeon2(DRIVETRAIN_PIGEON_ID);
   // FIXME Uncomment if you are using a NavX
 //  private final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
 
@@ -172,10 +173,15 @@ private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
   public void zeroGyroscope() {
     // FIXME Remove if you are using a Pigeon
     m_pigeon.setYaw(0.0);
+    //System.out.println("PIGEON " + m_pigeon.getYaw());
     
 
     // FIXME Uncomment if you are using a NavX
 //    m_navx.zeroYaw();
+  }
+
+  public void setGyroscope(double angle){
+        m_pigeon.setYaw(angle);
   }
 
   public Rotation2d getGyroscopeRotation() {
