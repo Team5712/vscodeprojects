@@ -5,49 +5,44 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Climber;
+import frc.robot.Constants;
+import frc.robot.subsystems.Magazine;
+import frc.robot.subsystems.Shooter;
 
-public class ClimbArmDown extends CommandBase {
-  private Climber m_climber;
-  boolean armsDown = false;
-  /** Creates a new Climb. */
-  public ClimbArmDown(Climber climber) {
-    m_climber = climber;
+public class AutoRevShooter extends CommandBase {
+  /** Creates a new ShootHigh. */
+
+  private Shooter m_shooter;
+  private Magazine m_magazine;
+  private double m_RPM;
+  private long endTimer;
+
+  public AutoRevShooter(Shooter shooter, double RPM) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_shooter = shooter;
+    m_RPM = RPM;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.
-  //true limit switches means they are not pressed
   @Override
   public void execute() {
-  //   if (m_climber.getLeftEncoderTicks() > -5000) {
-  //     m_climber.runClimber(0);
-  //   } 
-  // else {
-  //   m_climber.runClimber(.5);
-  // }
-  m_climber.runClimber(.5);
-  // m_climber.getLeftEncoderTicks();
-  //System.out.println(m_climber.getLeftEncoderTicks());
+    m_shooter.customShootHigh(m_RPM);
   }
-
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_climber.runClimber(0);
+    
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // return armsDown;
     return false;
   }
 }

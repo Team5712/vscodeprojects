@@ -150,7 +150,7 @@ public class RobotContainer {
 
   new Button(m_controller2::getBButton)
       // No requirements because we don't need to interrupt anything
-        .whenHeld(new ShootCustom(m_shooter, m_magazine,20000)
+        .whenHeld(new ShootCustom(m_shooter, m_magazine,17500)
         .alongWith(new HoodForward(m_shooter)));
 
   new Button(m_controller2::getLeftBumper)
@@ -232,11 +232,11 @@ Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
   trajectoryConfig);
 
   Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-  new Pose2d(.8, 0, new Rotation2d(-10)),
+  new Pose2d(-.8, 0, new Rotation2d(-10)),
   List.of(
-          new Translation2d(-.2, 1),
-          new Translation2d(0, 1.5)),
-  new Pose2d(.96, 2.1, Rotation2d.fromDegrees(-60)),
+          new Translation2d(.25, .5),
+          new Translation2d(.27, 1.5)),
+  new Pose2d(.3, 2.1, Rotation2d.fromDegrees(-60)),
   trajectoryConfig);
 
 // 3. Define PID controllers for tracking trajectory
@@ -266,13 +266,18 @@ SwerveControllerCommand swerveControllerCommand1 = new SwerveControllerCommand(
   m_drivetrainSubsystem::setAllStates,
   m_drivetrainSubsystem);
 
+  return new AutoPickUpBall(m_intake, m_magazine).alongWith(new SequentialCommandGroup(
+    new InstantCommand(() -> new AutoRevShooter(m_shooter, 12000)),
+    new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
+    swerveControllerCommand1,
+    new AutoShootCommand(m_magazine),
+    new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
+    swerveControllerCommand2,
+    new InstantCommand(() -> m_drivetrainSubsystem.stopModules())));
+
+  // return new AutoPickUpBall(m_intake, m_magazine);
+
 // 5. Add some init and wrap-up, and return everything
-return new SequentialCommandGroup(
-  new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
-  swerveControllerCommand1,
-  new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
-  swerveControllerCommand2,
-  new InstantCommand(() -> m_drivetrainSubsystem.stopModules()));
 }
 
 

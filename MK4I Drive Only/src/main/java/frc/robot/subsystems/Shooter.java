@@ -8,7 +8,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.CANSparkMax.IdleMode;
 
@@ -22,6 +24,7 @@ public class Shooter extends SubsystemBase {
   TalonFX leftShooter = new TalonFX(19);
   TalonFX rightShooter = new TalonFX(20);
   CANSparkMax hood = new CANSparkMax(21, com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless);
+  RelativeEncoder encoder = hood.getEncoder();
   SparkMaxLimitSwitch backLimitSwitch = hood.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);//back
   SparkMaxLimitSwitch forwardLimitSwitch = hood.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);//forward
 
@@ -62,9 +65,24 @@ public class Shooter extends SubsystemBase {
     rightShooter.config_kD(0, Constants.SHOOTING_Kd, 30);
     rightShooter.config_kF(0, Constants.SHOOTING_Kf, 30);
     rightShooter.config_IntegralZone(0, 50);
-
     leftShooter.set(ControlMode.Velocity, Constants.SHOOTING_UNITS_PER_REV * Constants.SHOOTING_TARGET_RPM_HIGH / 600);
     rightShooter.set(ControlMode.Velocity, Constants.SHOOTING_UNITS_PER_REV * Constants.SHOOTING_TARGET_RPM_HIGH / 600);
+  }
+
+    
+  public void customShootHigh(double velocity) {
+    leftShooter.config_kP(0, Constants.SHOOTING_Kp, 30);
+    leftShooter.config_kI(0, Constants.SHOOTING_Ki, 30);
+    leftShooter.config_kD(0, Constants.SHOOTING_Kd, 30);
+    leftShooter.config_kF(0, Constants.SHOOTING_Kf, 30);
+    leftShooter.config_IntegralZone(0, 50);
+    rightShooter.config_kP(0, Constants.SHOOTING_Kp, 30);
+    rightShooter.config_kI(0, Constants.SHOOTING_Ki, 30);
+    rightShooter.config_kD(0, Constants.SHOOTING_Kd, 30);
+    rightShooter.config_kF(0, Constants.SHOOTING_Kf, 30);
+    rightShooter.config_IntegralZone(0, 50);
+    leftShooter.set(ControlMode.Velocity, velocity);
+    rightShooter.set(ControlMode.Velocity, velocity);
   }
 
   public void shootLow() {
@@ -115,6 +133,10 @@ public class Shooter extends SubsystemBase {
     hood.set(power);
   }
 
+  public double relativeLeftEncoderTicks(double ticks) {
+    return 0;
+  }
+
   public void zeroEncoderOfHood(){
     hood.getEncoder().setPosition(0);
   }
@@ -124,6 +146,17 @@ public class Shooter extends SubsystemBase {
     rightShooter.set(ControlMode.PercentOutput, -.5);
   }
 
+  public double motorOutput(){
+    return leftShooter.getMotorOutputPercent();
+  }
+
+  public double leftSpeed() {
+    return leftShooter.getSelectedSensorVelocity();
+  }
+
+  public double getHoodPosition() {
+    return encoder.getPosition();
+  }
 
 
   @Override

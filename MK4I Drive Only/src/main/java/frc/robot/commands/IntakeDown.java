@@ -25,7 +25,7 @@ public class IntakeDown extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println("BUTTON PRESSSEED");
+    //System.out.println("BUTTON PRESSSEED");
     m_intake.moveSolenoid(true);
   }
 

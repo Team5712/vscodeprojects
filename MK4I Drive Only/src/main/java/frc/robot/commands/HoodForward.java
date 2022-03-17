@@ -24,7 +24,8 @@ public class HoodForward extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.moveHood(-.1);
+    // m_shooter.moveHood(-.1);
+    System.out.println(m_shooter.getHoodPosition());
   }
 
   // Called once the command ends or is interrupted.

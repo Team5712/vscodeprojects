@@ -207,7 +207,8 @@ private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
 
   @Override
   public void periodic() {
-    
+        m_odometry.update(getGyroscopeRotation(), getState(m_frontLeftModule) , getState(m_frontRightModule), getState(m_backLeftModule),
+        getState(m_backRightModule));
 
     
 
@@ -232,6 +233,10 @@ m_backRightModule.set(states[3].speedMetersPerSecond / swerve.MAX_VEL_METERS * s
                 updateOdometry(states);
                 
         }
+
+        public SwerveModuleState getState(SwerveModule module) {
+                return new SwerveModuleState(module.getDriveVelocity(), new Rotation2d(module.getSteerAngle()));
+            }
         
         public Pose2d getPose2d() {
                 return m_odometry.getPoseMeters();
@@ -244,6 +249,13 @@ m_backRightModule.set(states[3].speedMetersPerSecond / swerve.MAX_VEL_METERS * s
 }
 public void resetOdometry(Pose2d resetPos){
         m_odometry.resetPosition(resetPos, resetPos.getRotation());
+}
+
+public void stopModules() {
+        m_frontLeftModule.set(0, 0);
+        m_frontRightModule.set(0, 0);
+        m_backLeftModule.set(0, 0);
+        m_backRightModule.set(0, 0);
 }
 
         

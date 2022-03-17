@@ -9,49 +9,65 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Magazine;
 import frc.robot.subsystems.Shooter;
 
-public class ShootHigh extends CommandBase {
+public class ShootCustom extends CommandBase {
   /** Creates a new ShootHigh. */
 
   private Shooter m_shooter;
   private Magazine m_magazine;
+  private double m_RPM;
+  private long endTimer;
 
-  public ShootHigh(Shooter shooter, Magazine magazine) {
+  public ShootCustom(Shooter shooter, Magazine magazine, double RPM) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_magazine = magazine;
+    m_RPM = RPM;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    endTimer = System.currentTimeMillis();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.shootHigh();
+    m_shooter.customShootHigh(m_RPM);
+    
+    // try {
+    //   Thread.sleep(2000);
+    // } catch (InterruptedException e) {
+    //   // TODO Auto-generated catch block
+    //   e.printStackTrace();
+    // }
     //System.out.println(m_shooter.leftSpeed());
-    if (m_shooter.leftSpeed() < 12000 && m_shooter.leftSpeed() > 10000) {
-      if(m_magazine.getUpperBallSensor() < Constants.UPPER_BALL_SENSOR_THRESHOLD){
-        m_magazine.runLowerMag(0);
-        m_magazine.runUpperMag(-.3);       
+    if (System.currentTimeMillis() - endTimer > 2000) {
+      if (m_shooter.leftSpeed() < m_RPM*1.1 && m_shooter.leftSpeed() > m_RPM*0.9) {
+        if(m_magazine.getUpperBallSensor() < Constants.UPPER_BALL_SENSOR_THRESHOLD){
+          m_magazine.runLowerMag(.2);
+          m_magazine.runUpperMag(-.2);
+        }
+        else{
+          m_magazine.runLowerMag(0);
+          m_magazine.runUpperMag(-.2); 
+        }
+  
       }
       else{
-        m_magazine.runLowerMag(.2);
-        m_magazine.runUpperMag(-.2);
+        m_magazine.runLowerMag(0);
+        m_magazine.runUpperMag(0);   
       }
+    }
 
-    }
-    else{
-      m_magazine.runLowerMag(0);
-      m_magazine.runUpperMag(0);   
-    }
-    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_shooter.stop();
+    m_magazine.runLowerMag(0);
+    m_magazine.runUpperMag(0);  
   }
 
   // Returns true when the command should end.

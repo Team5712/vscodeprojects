@@ -25,7 +25,7 @@ public class RunLowerMag extends CommandBase {
   @Override
   public void execute() {
     m_magazine.runLowerMag(.5);
-    System.out.println("UPPER BALL SENSOR" + m_magazine.getLowerBallSensor());
+    //System.out.println("UPPER BALL SENSOR" + m_magazine.getLowerBallSensor());
   }
 
   // Called once the command ends or is interrupted.

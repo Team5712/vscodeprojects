@@ -5,49 +5,53 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Intake;
 
-public class ClimbArmDown extends CommandBase {
-  private Climber m_climber;
-  boolean armsDown = false;
-  /** Creates a new Climb. */
-  public ClimbArmDown(Climber climber) {
-    m_climber = climber;
+public class AutoIntakeDown extends CommandBase {
+
+    private Intake m_intake;
+    private boolean commandFinished;
+    private long endTimer = 0;
+    double runTimeCommand = 0;
+
+  /** Creates a new IntakeDown. */
+  public AutoIntakeDown(Intake intake, double runTimeCommandSec) {
+    m_intake = intake;
+
+    runTimeCommand = runTimeCommandSec;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    commandFinished = false;
+    endTimer = System.currentTimeMillis();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
-  //true limit switches means they are not pressed
   @Override
   public void execute() {
-  //   if (m_climber.getLeftEncoderTicks() > -5000) {
-  //     m_climber.runClimber(0);
-  //   } 
-  // else {
-  //   m_climber.runClimber(.5);
-  // }
-  m_climber.runClimber(.5);
-  // m_climber.getLeftEncoderTicks();
-  //System.out.println(m_climber.getLeftEncoderTicks());
+    if(System.currentTimeMillis()-endTimer<(runTimeCommand*1000)){
+    //System.out.println("BUTTON PRESSSEED");
+      m_intake.moveSolenoid(true);
+    }
+    else{
+      end(true);
+      commandFinished = true;
+      isFinished();
+    }
   }
-
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_climber.runClimber(0);
+    m_intake.moveSolenoid(false);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // return armsDown;
-    return false;
+    return commandFinished;
   }
 }

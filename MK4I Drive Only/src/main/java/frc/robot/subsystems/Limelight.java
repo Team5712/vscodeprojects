@@ -49,6 +49,9 @@ public class Limelight extends SubsystemBase {
     return longside;
   }
   
+  public void targetingOnFunc(){
+    targetingOn = true;
+  }
   public void targetToggle(boolean onOff) {
     targetingOn = onOff;
   }
@@ -57,9 +60,9 @@ public class Limelight extends SubsystemBase {
     //double x = getX();
     //System.out.println(getX());
     if (targetingOn) {
-      System.out.println(getX());
+      //System.out.println(getX());
       if (getX() > 1){
-        if (getX() < 1){
+        if (getX() > 5){
           output = -.04 * getX();
         }
         else{
@@ -74,6 +77,9 @@ public class Limelight extends SubsystemBase {
           output = -.02 * getX();
         }  
       } 
+      if(Math.abs(output)>.5){
+        output = Math.signum(output)*.5;
+      }
       return output;
     }
     else {

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -47,24 +49,26 @@ public final class Constants {
     public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5; // FIXME Set back left drive motor ID
     public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6; // FIXME Set back left steer motor ID
     public static final int BACK_LEFT_MODULE_STEER_ENCODER = 11; // FIXME Set back left steer encoder ID
-    public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(257.16); // FIXME Measure and set back left steer offset
+    public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(90); // FIXME Measure and set back left steer offset
 
     public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 7; // FIXME Set back right drive motor ID
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 8; // FIXME Set back right steer motor ID
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 12; // FIXME Set back right steer encoder ID
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(225); // FIXME Measure and set back right steer offset
 
-    public static final double SHOOTING_Kp = .01;
+    public static final double SHOOTING_Kp = .25; //.01
     public static final double SHOOTING_Ki = 0; // .001
     public static final double SHOOTING_Kd = 0; // 70.5
     public static final double SHOOTING_Kf = 0.0639; //
     public static final double SHOOTING_Kizone = 0; // 50
-    public static final double SHOOTING_TARGET_RPM_HIGH = 7500;
+    public static final double SHOOTING_TARGET_RPM_HIGH = 8000;
     public static final double SHOOTING_TARGET_RPM_LOW = 5000;
     public static final double SHOOTING_UNITS_PER_REV = 820;
 
     public static final double UPPER_BALL_SENSOR_THRESHOLD = 1000;
     public static final double LOWER_BALL_SENSOR_THRESHOLD = 1000;
+    public static final double CLIMBER_HIGH_TICKS = 270000; //273141
+    
 
 
 
@@ -76,10 +80,10 @@ public static final class swerve {
         // ORDER: FL FR BL BR
         //6380 first num
         // 3.8
-        public static final double MAX_VEL_METERS = 3.8; // 3.7 worked with 2 inches of error at 8 max ang accel
+        // public static final double MAX_VEL_METERS = 3.8; // 3.7 worked with 2 inches of error at 8 max ang accel
 
-        // public static final double MAX_VEL_METERS = 6380.0 / 60.0 * MK3_FAST.getDriveReduction()
-        //         * MK3_FAST.getWheelDiameter() * Math.PI;
+        public static final double MAX_VEL_METERS = 6380.0 / 60.0 *  SdsModuleConfigurations.MK4I_L2.getDriveReduction()
+                * SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
 
         // public static final double MAX_ANG_VEL_RAD = MAX_VEL_METERS
         //         / Math.hypot(Constants.dimensions.TRACKWIDTH / 2.0, Constants.dimensions.WHEELBASE / 2.0);
@@ -113,15 +117,15 @@ public static final class swerve {
 
         public static final class follower {
         
-            private static final double MAX_ANG_VEL_RAD_AUTO = 8 * Math.PI; // doesn't seem to do anything for the X direction
+            private static final double MAX_ANG_VEL_RAD_AUTO = .25 * Math.PI; // doesn't seem to do anything for the X direction
             public static final TrapezoidProfile.Constraints ROT_PROFILE = new TrapezoidProfile.Constraints(
                     MAX_ANG_VEL_RAD_AUTO, swerve.MAX_ANG_ACCEL);
                 // x distance PID controller
-            public static final PIDController X_PID_CONTROLLER = new PIDController(5, 0, 0); // 5
+            public static final PIDController X_PID_CONTROLLER = new PIDController(1.5, 0, 0); // 5
                 // y distance PID controller
-            public static final PIDController Y_PID_CONTROLLER = new PIDController(5, 0, 0); // 5, 0, .0 0.3, 0.4, 4
+            public static final PIDController Y_PID_CONTROLLER = new PIDController(1.5, 0, 0); // 5, 0, .0 0.3, 0.4, 4
                 // ROTATION (angle) PID controller
-            public static final ProfiledPIDController ROT_PID_CONTROLLER = new ProfiledPIDController(.5, 0, 0, //.85 works
+            public static final ProfiledPIDController ROT_PID_CONTROLLER = new ProfiledPIDController(-3, 0, 0, //.85 works
                     ROT_PROFILE); 
             // DRIVING DEFAULT IS 5
             public static final double LINEAR_VELOCITY_DEFAULT = 5; // no change

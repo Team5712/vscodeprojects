@@ -4,50 +4,35 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.DrivetrainSubsystem;
 
-public class ClimbArmDown extends CommandBase {
-  private Climber m_climber;
-  boolean armsDown = false;
-  /** Creates a new Climb. */
-  public ClimbArmDown(Climber climber) {
-    m_climber = climber;
+public class RealignWheels extends CommandBase {
+  /** Creates a new RealignWheels. */
+  private DrivetrainSubsystem m_drivetrainSubsystem;
+  public RealignWheels(DrivetrainSubsystem drivetrainSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_drivetrainSubsystem = drivetrainSubsystem;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
-  //true limit switches means they are not pressed
   @Override
   public void execute() {
-  //   if (m_climber.getLeftEncoderTicks() > -5000) {
-  //     m_climber.runClimber(0);
-  //   } 
-  // else {
-  //   m_climber.runClimber(.5);
-  // }
-  m_climber.runClimber(.5);
-  // m_climber.getLeftEncoderTicks();
-  //System.out.println(m_climber.getLeftEncoderTicks());
+    m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0));
   }
-
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_climber.runClimber(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // return armsDown;
     return false;
   }
 }

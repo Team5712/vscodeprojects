@@ -27,30 +27,29 @@ public class ClimbArmUp extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_climber.getLimitSwitchRightUp() && m_climber.getLimitSwitchLeftUp()){
-      if (m_pigeon.getPitch() > -.04 ){
-        
-        m_climber.runClimber(-.25);
-      }
-     else{
-       m_climber.runClimber(0);
-     }
-    }
-    else{
-      m_climber.runClimber(0);
-      armsUp = true;
-    }
- 
-    
+    //260000
+    //274000
+  //   if (m_climber.getLeftEncoderTicks() < -275000) {
+  //     m_climber.runClimber(0);
+  //   } 
+  // else {
+  //   m_climber.runClimber(-.5);
+  // }
+  m_climber.runClimber(-.5);
+  //System.out.println(m_climber.getLeftEncoderTicks());
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_climber.runClimber(0);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return armsUp;
+    // return armsUp;
+    return false;
+
   }
 }
