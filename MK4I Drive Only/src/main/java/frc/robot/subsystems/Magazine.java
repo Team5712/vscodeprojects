@@ -8,9 +8,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Magazine extends SubsystemBase {
+
 
   CANSparkMax lowerMagazine = new CANSparkMax(16, com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless);
   CANSparkMax upperMagazine = new CANSparkMax(17, com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless);

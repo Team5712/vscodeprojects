@@ -77,14 +77,12 @@ public class Limelight extends SubsystemBase {
           output = -.02 * getX();
         }  
       } 
-      if(Math.abs(output)>.5){
-        output = Math.signum(output)*.5;
+      if(Math.abs(getX()*-.04)>.5){
+        output = Math.signum(getX())*-.5;
       }
       return output;
     }
-    else {
-      return 0;
-    }
+    return 0;
   }
 
   @Override

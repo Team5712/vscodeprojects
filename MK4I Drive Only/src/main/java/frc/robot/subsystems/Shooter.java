@@ -16,6 +16,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -25,13 +28,15 @@ public class Shooter extends SubsystemBase {
   TalonFX rightShooter = new TalonFX(20);
   CANSparkMax hood = new CANSparkMax(21, com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless);
   RelativeEncoder encoder = hood.getEncoder();
-  SparkMaxLimitSwitch backLimitSwitch = hood.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);//back
-  SparkMaxLimitSwitch forwardLimitSwitch = hood.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed);//forward
+  SparkMaxLimitSwitch backLimitSwitch = hood.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);//back
+  SparkMaxLimitSwitch forwardLimitSwitch = hood.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);//forward
+  // Magazine m_magazine = new Magazine();
 
   /** Creates a new Shooter. */
   public Shooter() {
     leftShooter.setNeutralMode(NeutralMode.Brake);
     rightShooter.setNeutralMode(NeutralMode.Brake);
+    customShootHigh(0);
     hood.setIdleMode(IdleMode.kBrake);
     rightShooter.setInverted(true);
     rightShooter.follow(leftShooter, FollowerType.AuxOutput1);
@@ -107,6 +112,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stop() {
+    customShootHigh(0);
     leftShooter.config_kP(0, 0, 30);
     leftShooter.config_kI(0, 0, 30);
     leftShooter.config_kD(0, 0, 30);
@@ -119,6 +125,7 @@ public class Shooter extends SubsystemBase {
     rightShooter.config_IntegralZone(0, 50);
     leftShooter.set(ControlMode.PercentOutput, 0.0);
     rightShooter.set(ControlMode.PercentOutput, 0.0);
+    
     
   }
 
@@ -159,8 +166,9 @@ public class Shooter extends SubsystemBase {
   }
 
 
+
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+ 
   }
 }

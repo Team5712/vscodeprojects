@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -71,6 +72,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+
     // Set up the default command for the drivetrain.
     // The controls are for field-oriented driving:
     // Left stick Y axis -> forward and backwards movement
@@ -97,6 +99,8 @@ public class RobotContainer {
    */
   
   private void configureButtonBindings() {
+      //m_controller2.setRumble(RumbleType.kLeftRumble, 1);
+      //m_controller1.setRumble(RumbleType.kLeftRumble, 1);
     // Back button zeros the gyroscope
     new Button(m_controller1::getAButton)
            // No requirements because we don't need to interrupt anything
@@ -138,20 +142,24 @@ public class RobotContainer {
 
   new Button(m_controller2::getRightBumper)
   // No requirements because we don't need to interrupt anything
-    .whenHeld(new ShootCustom(m_shooter, m_magazine,12500));
+    .whenHeld(new ShootCustom(m_shooter, m_magazine,11500,-3));
+    //Box shot -4 for CustomHood 11500 for ShootCustom
+    //Safe zone short shot -8 13000
+    //Safe zone long shot -7.8 14000
+    //Auto deep shot -8.2, 16000
 
     new Button(m_controller2::getXButton)
   // No requirements because we don't need to interrupt anything
-    .whenHeld(new ShootCustom(m_shooter, m_magazine,14000));
+    //.whenHeld(new ShootCustom(m_shooter, m_magazine,14000));
+    .toggleWhenPressed(new CustomHoodAngle(m_shooter, -8.2));
 
   new Button(m_controller2::getYButton)
     // No requirements because we don't need to interrupt anything
-      .whenHeld(new ShootCustom(m_shooter, m_magazine,6000));
+    .whenHeld(new CustomHoodAngle(m_shooter, -5));
 
   new Button(m_controller2::getBButton)
       // No requirements because we don't need to interrupt anything
-        .whenHeld(new ShootCustom(m_shooter, m_magazine,17500)
-        .alongWith(new HoodForward(m_shooter)));
+        .whenHeld(new ShootCustom(m_shooter, m_magazine,13000,-6));
 
   new Button(m_controller2::getLeftBumper)
     // No requirements because we don't need to interrupt anything
@@ -203,7 +211,8 @@ public class RobotContainer {
                 .whenHeld(new ClimbArmDown(m_climber));
     new Button(m_testcontroller::getYButton)
   //              // No requirements because we don't need to interrupt anything
-                .whenHeld(new ClimbArmUp(m_climber));
+                .whenHeld(new ClimbArmUp(m_climber)
+                .alongWith(new ShootStop(m_shooter)));
     new Button(m_testcontroller::getXButton)
   //              // No requirements because we don't need to interrupt anything
                 .whenPressed(new ClimbArmForward(m_climber));
@@ -219,6 +228,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+
+    m_shooter.zeroEncoderOfHood();
+    m_drivetrainSubsystem.zeroGyroscope();
 // 1. Create trajectory settings
 TrajectoryConfig trajectoryConfig = Constants.auto.follower.T_CONFIG;
 
@@ -228,16 +240,25 @@ Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
   List.of(
           new Translation2d(-.5, 0),
           new Translation2d(-.75, 0)),
-  new Pose2d(-.8, 0, Rotation2d.fromDegrees(-10)),
+  new Pose2d(-1, 0, Rotation2d.fromDegrees(-10)),
   trajectoryConfig);
 
   Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-  new Pose2d(-.8, 0, new Rotation2d(-10)),
+  new Pose2d(-1, 0, new Rotation2d(-10)),
   List.of(
-          new Translation2d(.25, .5),
-          new Translation2d(.27, 1.5)),
-  new Pose2d(.3, 2.1, Rotation2d.fromDegrees(-60)),
+          new Translation2d(-.3, .75),
+          new Translation2d(.2, 1.5)),
+  new Pose2d(.35, 1.75, Rotation2d.fromDegrees(-70)), //.4 2.15
   trajectoryConfig);
+
+  Trajectory trajectory3 = TrajectoryGenerator.generateTrajectory(
+  new Pose2d(.35, 2.15, new Rotation2d(-60)),
+  List.of(
+          new Translation2d(.2, 2.5),
+          new Translation2d(.1, 4.5)),
+  new Pose2d(0, 5, Rotation2d.fromDegrees(-80)),
+  trajectoryConfig);
+
 
 // 3. Define PID controllers for tracking trajectory
 PIDController xController = Constants.auto.follower.X_PID_CONTROLLER;
@@ -256,7 +277,7 @@ SwerveControllerCommand swerveControllerCommand1 = new SwerveControllerCommand(
   m_drivetrainSubsystem::setAllStates,
   m_drivetrainSubsystem);
 
-  SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
+SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
   trajectory2,
   m_drivetrainSubsystem::getPose2d,
   m_drivetrainSubsystem.getKinematics(),
@@ -266,14 +287,43 @@ SwerveControllerCommand swerveControllerCommand1 = new SwerveControllerCommand(
   m_drivetrainSubsystem::setAllStates,
   m_drivetrainSubsystem);
 
-  return new AutoPickUpBall(m_intake, m_magazine).alongWith(new SequentialCommandGroup(
-    new InstantCommand(() -> new AutoRevShooter(m_shooter, 12000)),
+  SwerveControllerCommand swerveControllerCommand3 = new SwerveControllerCommand(
+    trajectory3,
+    m_drivetrainSubsystem::getPose2d,
+    m_drivetrainSubsystem.getKinematics(),
+    xController,
+    yController,
+    thetaController,
+    m_drivetrainSubsystem::setAllStates,
+    m_drivetrainSubsystem); 
+
+  // return new SequentialCommandGroup(
+  //   new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
+  //   swerveControllerCommand1,
+  //   new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
+  //   swerveControllerCommand2,
+  //   new InstantCommand(() -> m_drivetrainSubsystem.stopModules())
+  //   );
+
+  m_shooter.moveHood(0);
+  m_shooter.stop();
+  m_magazine.runUpperMag(0);
+  return new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4).alongWith(
+    new SequentialCommandGroup(
     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
     swerveControllerCommand1,
-    new AutoShootCommand(m_magazine),
+    new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+    new AutoShootCommand(m_magazine, m_shooter, 11500),
+    new WaitCommand(2),
+    new AutoShootCommand(m_magazine, m_shooter, 11500),
     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
     swerveControllerCommand2,
-    new InstantCommand(() -> m_drivetrainSubsystem.stopModules())));
+    new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+    // new AutoShootCommand(m_magazine),
+    // new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory3.getInitialPose())),
+    // swerveControllerCommand3,
+    new ContinueAutoShootCommand(m_magazine)
+    ));
 
   // return new AutoPickUpBall(m_intake, m_magazine);
 

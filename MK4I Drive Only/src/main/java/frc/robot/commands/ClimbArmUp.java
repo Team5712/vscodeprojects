@@ -4,6 +4,10 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
+
+import java.sql.Time;
+
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -11,7 +15,7 @@ import frc.robot.subsystems.Climber;
 
 public class ClimbArmUp extends CommandBase {
   private final Pigeon2 m_pigeon = new Pigeon2(13);
-  
+  private Timer timer = new Timer();
   private Climber m_climber;
   boolean armsUp = false;
   /** Creates a new Climb. */
@@ -22,7 +26,10 @@ public class ClimbArmUp extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    timer.reset();
+    timer.start();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -35,7 +42,12 @@ public class ClimbArmUp extends CommandBase {
   // else {
   //   m_climber.runClimber(-.5);
   // }
-  m_climber.runClimber(-.5);
+  if(timer.get()<.5){
+    m_climber.runClimber(-.5);
+  }
+  else{
+    m_climber.runClimber(-1);
+  }  
   //System.out.println(m_climber.getLeftEncoderTicks());
   }
 

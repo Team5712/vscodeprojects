@@ -4,6 +4,10 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Magazine;
@@ -15,34 +19,34 @@ public class ShootCustom extends CommandBase {
   private Shooter m_shooter;
   private Magazine m_magazine;
   private double m_RPM;
-  private long endTimer;
+  private double m_setHoodAngle;
+  private final Timer timer = new Timer();
 
-  public ShootCustom(Shooter shooter, Magazine magazine, double RPM) {
+  public ShootCustom(Shooter shooter, Magazine magazine, double RPM, double setHoodAngle) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_magazine = magazine;
+    m_setHoodAngle = setHoodAngle;
     m_RPM = RPM;
+    
+    Shuffleboard.selectTab("Match");
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    endTimer = System.currentTimeMillis();
+    timer.reset();
+    timer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     m_shooter.customShootHigh(m_RPM);
-    
-    // try {
-    //   Thread.sleep(2000);
-    // } catch (InterruptedException e) {
-    //   // TODO Auto-generated catch block
-    //   e.printStackTrace();
-    // }
-    //System.out.println(m_shooter.leftSpeed());
-    if (System.currentTimeMillis() - endTimer > 2000) {
+    double currentPosition = m_shooter.getHoodPosition();
+    double errorDis = currentPosition-m_setHoodAngle;
+    m_shooter.moveHood(errorDis*-.03);
+    if (timer.get()>.25) {
       if (m_shooter.leftSpeed() < m_RPM*1.1 && m_shooter.leftSpeed() > m_RPM*0.9) {
         if(m_magazine.getUpperBallSensor() < Constants.UPPER_BALL_SENSOR_THRESHOLD){
           m_magazine.runLowerMag(.2);
@@ -65,7 +69,7 @@ public class ShootCustom extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.stop();
+    m_shooter.customShootHigh(6000);
     m_magazine.runLowerMag(0);
     m_magazine.runUpperMag(0);  
   }

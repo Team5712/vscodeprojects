@@ -13,7 +13,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Magazine;
 import frc.robot.subsystems.Shooter;
 
-public class AutoShootCommand extends CommandBase {
+public class ContinueAutoShootCommand extends CommandBase {
   /** Creates a new ShootHigh. */
 
   private Shooter m_shooter;
@@ -24,35 +24,33 @@ public class AutoShootCommand extends CommandBase {
   private Intake m_intake;
   private final Timer timer = new Timer();
 
-  public AutoShootCommand(Magazine magazine, Shooter shooter, double RPM) {
+  public ContinueAutoShootCommand(Magazine magazine) {
     // Use addRequirements() here to declare subsystem dependencies.
      m_magazine = magazine;
-     m_RPM = RPM;
-     m_shooter = shooter;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     commandFinished = false;
+    timer.reset();
+    timer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
+    if(timer.get() < 10){
       if(m_magazine.getUpperBallSensor() > Constants.UPPER_BALL_SENSOR_THRESHOLD){
-        if (m_shooter.leftSpeed() < m_RPM*1.1 && m_shooter.leftSpeed() > m_RPM*0.9) {
-            //System.out.println("High Ball Shoting");
-            m_magazine.runUpperMag(-.4);  
-          }
-        }
-          else{
-            //System.out.println("Low Ball Shoting");
-            m_magazine.runUpperMag(0);
-            commandFinished = true;
-          }
-          
+      //System.out.println("High Ball Shoting");
+       m_magazine.runUpperMag(-.6);  
+      }
+     }
+    else{
+      //System.out.println("Low Ball Shoting");
+      m_magazine.runUpperMag(0);
+      commandFinished = true;
+    }        
   }
 
   // Called once the command ends or is interrupted.

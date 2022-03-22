@@ -9,22 +9,28 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Magazine;
+import frc.robot.subsystems.Shooter;
 
 public class AutoPickUpBall extends CommandBase {
   /** Creates a new PickUpBall. */
 
   private Intake m_intake;
   private Magazine m_magazine;
+  private Shooter m_shooter;
   private boolean commandFinished;
+  private double m_shooteSpeed;
   private double runTimeCommand;
   private long endTimer = 0;
   private double value = 0;
+  private double m_setHoodAngle;
   private final Timer timer = new Timer();
-
-  public AutoPickUpBall(Intake intake, Magazine magazine) {
+  public AutoPickUpBall(Intake intake, Magazine magazine, Shooter shooter, double shooteSpeed, double setHoodAngle) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_intake = intake;
     m_magazine = magazine;
+    m_shooter = shooter;
+    m_shooteSpeed = shooteSpeed;
+    m_setHoodAngle = setHoodAngle;
   }
 
   // Called when the command is initially scheduled.
@@ -44,7 +50,12 @@ public class AutoPickUpBall extends CommandBase {
     // m_magazine.runLowerMag(0.7);
     // m_magazine.runUpperMag(-.7);
     // high no ball is ~250, with ball ~1100/
-    if (timer.get() > 7) {
+    m_shooter.customShootHigh(m_shooteSpeed);
+    double currentPosition = m_shooter.getHoodPosition();
+    double errorDis = currentPosition-m_setHoodAngle;
+    // System.out.println("Location is : "+m_shooter.getHoodPosition());
+    m_shooter.moveHood(errorDis*-.03);
+    if (timer.get() > 10) {
       m_intake.moveIntake(0);
       m_magazine.runLowerMag(0);
       m_magazine.runUpperMag(0);
@@ -53,8 +64,7 @@ public class AutoPickUpBall extends CommandBase {
     }
       if (m_magazine.getUpperBallSensor() > Constants.UPPER_BALL_SENSOR_THRESHOLD) {  
 
-        if(m_magazine.getLowerBallSensor() < Constants.UPPER_BALL_SENSOR_THRESHOLD){
-        
+        if(m_magazine.getLowerBallSensor() < Constants.UPPER_BALL_SENSOR_THRESHOLD){   
         // if (value == 0) {
           System.out.println("full");
           // value = 1;
