@@ -8,8 +8,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Magazine extends SubsystemBase {
 
@@ -20,11 +22,14 @@ public class Magazine extends SubsystemBase {
   AnalogInput upperBallSensor = new AnalogInput(0);
 
 
+
   
   /** Creates a new Magazine. */
   public Magazine() {
   lowerMagazine.setIdleMode(IdleMode.kBrake);
   upperMagazine.setIdleMode(IdleMode.kBrake);
+  SmartDashboard.putBoolean("UPPER", ballInUpper());
+  SmartDashboard.putBoolean("LOWER", ballInLower());
   }
 
   public void runLowerMag(double speed) {
@@ -33,6 +38,14 @@ public class Magazine extends SubsystemBase {
 
   public void runUpperMag(double speed) {
     upperMagazine.set(speed);
+  }
+
+  public boolean ballInUpper() {
+    return upperBallSensor.getValue() > Constants.UPPER_BALL_SENSOR_THRESHOLD;
+  }
+
+  public boolean ballInLower() {
+    return lowerBallSensor.getValue() < Constants.LOWER_BALL_SENSOR_THRESHOLD;
   }
 
   public double getLowerBallSensor() {
@@ -53,5 +66,7 @@ public class Magazine extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("UPPER", ballInUpper());
+    SmartDashboard.putBoolean("LOWER", ballInLower());
   }
 }

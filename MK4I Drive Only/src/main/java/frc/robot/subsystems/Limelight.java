@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Limelight extends SubsystemBase {
@@ -31,6 +32,8 @@ public class Limelight extends SubsystemBase {
   Boolean targetingOn = false;
 
   public Limelight() {
+    SmartDashboard.putBoolean("DISTANCE", tarmacDistance());
+    SmartDashboard.putBoolean("ANGLE", alignGood());
   }
 
   public double getY(){
@@ -47,6 +50,22 @@ public class Limelight extends SubsystemBase {
   }
   public double getLongSide(){
     return longside;
+  }
+
+  public boolean tarmacDistance() {
+    if (ty.getDouble(0.0) > 6 && ty.getDouble(0.0) < 10) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean alignGood() {
+    if (tx.getDouble(0.0) > -3 && tx.getDouble(0.0) < 3) {
+      return true;
+    } else {
+      return false;
+    }
   }
   
   public void targetingOnFunc(){
@@ -88,5 +107,6 @@ public class Limelight extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("DISTANCE", tarmacDistance());
   }
 }

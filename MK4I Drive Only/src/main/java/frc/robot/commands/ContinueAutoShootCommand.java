@@ -24,9 +24,10 @@ public class ContinueAutoShootCommand extends CommandBase {
   private Intake m_intake;
   private final Timer timer = new Timer();
 
-  public ContinueAutoShootCommand(Magazine magazine) {
+  public ContinueAutoShootCommand(Magazine magazine, double rpm) {
     // Use addRequirements() here to declare subsystem dependencies.
      m_magazine = magazine;
+     m_RPM = rpm;
   }
 
   // Called when the command is initially scheduled.
@@ -40,10 +41,12 @@ public class ContinueAutoShootCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timer.get() < 10){
+    if(timer.get() < 20){
       if(m_magazine.getUpperBallSensor() > Constants.UPPER_BALL_SENSOR_THRESHOLD){
+        if (m_shooter.leftSpeed() < m_RPM*1.1 && m_shooter.leftSpeed() > m_RPM*0.9) {
       //System.out.println("High Ball Shoting");
-       m_magazine.runUpperMag(-.6);  
+         m_magazine.runUpperMag(-.4); 
+        }
       }
      }
     else{

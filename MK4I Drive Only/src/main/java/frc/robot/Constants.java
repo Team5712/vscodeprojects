@@ -117,7 +117,7 @@ public static final class swerve {
 
         public static final class follower {
         
-            private static final double MAX_ANG_VEL_RAD_AUTO = .25 * Math.PI; // doesn't seem to do anything for the X direction
+            private static final double MAX_ANG_VEL_RAD_AUTO = .4 * Math.PI; //.25
             public static final TrapezoidProfile.Constraints ROT_PROFILE = new TrapezoidProfile.Constraints(
                     MAX_ANG_VEL_RAD_AUTO, swerve.MAX_ANG_ACCEL);
                 // x distance PID controller

@@ -33,6 +33,8 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -137,7 +139,7 @@ public class RobotContainer {
   //new Button(m_controller1::getStartButton)
   //.whenHeld(new IntakeDown(m_intake));
 
-  new Button(m_controller1::getXButton)
+  new Button(m_controller2::getAButton)
     .whenHeld(new CalibrateHood(m_shooter));
 
   new Button(m_controller2::getRightBumper)
@@ -150,12 +152,13 @@ public class RobotContainer {
 
     new Button(m_controller2::getXButton)
   // No requirements because we don't need to interrupt anything
-    //.whenHeld(new ShootCustom(m_shooter, m_magazine,14000));
-    .toggleWhenPressed(new CustomHoodAngle(m_shooter, -8.2));
+    .whenHeld(new ShootCustom(m_shooter, m_magazine,14000,-8.2));
+    // .toggleWhenPressed(new CustomHoodAngle(m_shooter, -8.2));
 
   new Button(m_controller2::getYButton)
     // No requirements because we don't need to interrupt anything
-    .whenHeld(new CustomHoodAngle(m_shooter, -5));
+    .whenHeld(new ShootCustom(m_shooter, m_magazine,6000,-5));
+    // .whenHeld(new CustomHoodAngle(m_shooter, -5));
 
   new Button(m_controller2::getBButton)
       // No requirements because we don't need to interrupt anything
@@ -248,15 +251,18 @@ Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
   List.of(
           new Translation2d(-.3, .75),
           new Translation2d(.2, 1.5)),
-  new Pose2d(.35, 1.75, Rotation2d.fromDegrees(-70)), //.4 2.15
+  new Pose2d(0.35, 1.75, Rotation2d.fromDegrees(-70)), //.4 2.15
   trajectoryConfig);
 
   Trajectory trajectory3 = TrajectoryGenerator.generateTrajectory(
-  new Pose2d(.35, 2.15, new Rotation2d(-60)),
+  new Pose2d(0, 0, new Rotation2d(-70)), //.35 1.75
   List.of(
-          new Translation2d(.2, 2.5),
-          new Translation2d(.1, 4.5)),
-  new Pose2d(0, 5, Rotation2d.fromDegrees(-80)),
+          new Translation2d(-.9 * .3, 2.5 * .3),
+          new Translation2d(-.9 * .6, 2.5 * .6)),
+          //Closer to tower decrease 5.5
+          //Closer to middle of field increase -.5
+  //5.6 worked then ran into wall I suggest lowering it by 1 and tuning from there
+  new Pose2d(-0.9, 2.5, Rotation2d.fromDegrees(-70)),
   trajectoryConfig);
 
 
@@ -305,25 +311,86 @@ SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
   //   new InstantCommand(() -> m_drivetrainSubsystem.stopModules())
   //   );
 
+  // 3 Ball
+  // m_shooter.moveHood(0);
+  // m_shooter.stop();
+  // m_magazine.runUpperMag(0);
+  // return new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4).alongWith(
+  //   new SequentialCommandGroup(
+  //   new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
+  //   swerveControllerCommand1,
+  //   new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+  //   new AutoShootCommand(m_magazine, m_shooter, 11500),
+  //   new WaitCommand(2),
+  //   new AutoShootCommand(m_magazine, m_shooter, 11500),
+  //   new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
+  //   swerveControllerCommand2,
+  //   new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+  //   new WaitCommand(1),
+  //   new AutoShootCommand(m_magazine, m_shooter, 11500)));
+
+//5 ball
+  // m_shooter.moveHood(0);
+  // m_shooter.stop();
+  // m_magazine.runUpperMag(0);
+  // return new ParallelRaceGroup(
+  //   new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4),
+  //   new SequentialCommandGroup(
+  //     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
+  //     swerveControllerCommand1,
+  //     new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+  //     new AutoShootCommand(m_magazine, m_shooter, 11500),
+  //     new WaitCommand(1),
+  //     new AutoShootCommand(m_magazine, m_shooter, 11500),
+  //     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
+  //     swerveControllerCommand2,
+  //     new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+  //     new WaitCommand(1),
+  //     new AutoShootCommand(m_magazine, m_shooter, 11500))).andThen(
+  //     new AutoPickUpBall(m_intake, m_magazine, m_shooter,16000,-8.2).alongWith(new SequentialCommandGroup(
+  //     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory3.getInitialPose())),
+  //     swerveControllerCommand3, 
+  //     new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+  //     new WaitCommand(1),
+  //     new AutoShootCommand(m_magazine, m_shooter, 16000),
+  //     new WaitCommand(1),
+  //     new AutoShootCommand(m_magazine, m_shooter, 16000) 
+  //   )));
+
   m_shooter.moveHood(0);
   m_shooter.stop();
   m_magazine.runUpperMag(0);
-  return new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4).alongWith(
-    new SequentialCommandGroup(
-    new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
-    swerveControllerCommand1,
-    new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-    new AutoShootCommand(m_magazine, m_shooter, 11500),
-    new WaitCommand(2),
-    new AutoShootCommand(m_magazine, m_shooter, 11500),
-    new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
-    swerveControllerCommand2,
-    new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-    // new AutoShootCommand(m_magazine),
-    // new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory3.getInitialPose())),
-    // swerveControllerCommand3,
-    new ContinueAutoShootCommand(m_magazine)
-    ));
+  return new SequentialCommandGroup(
+    new ParallelRaceGroup(
+      new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4),
+      new SequentialCommandGroup(
+        new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
+        swerveControllerCommand1,
+        new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+        new AutoShootCommand(m_magazine, m_shooter, 11500),
+        new WaitCommand(1),
+        new AutoShootCommand(m_magazine, m_shooter, 11500),
+        new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
+        swerveControllerCommand2,
+        new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+        new WaitCommand(1),
+        new AutoShootCommand(m_magazine, m_shooter, 11500)
+      )
+    ),
+    new ParallelCommandGroup(
+      new AutoPickUpBall(m_intake, m_magazine, m_shooter,16000,-8.2),
+      new SequentialCommandGroup(
+        new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory3.getInitialPose())),
+        swerveControllerCommand3, 
+        new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+        new WaitCommand(1),
+        new AutoShootCommand(m_magazine, m_shooter, 16000),
+        new WaitCommand(1),
+        new AutoShootCommand(m_magazine, m_shooter, 16000) 
+      )
+    )
+  );
+    
 
   // return new AutoPickUpBall(m_intake, m_magazine);
 

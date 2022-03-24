@@ -72,6 +72,7 @@ public class ShootCustom extends CommandBase {
     m_shooter.customShootHigh(6000);
     m_magazine.runLowerMag(0);
     m_magazine.runUpperMag(0);  
+    m_shooter.moveHood(0);
   }
 
   // Returns true when the command should end.

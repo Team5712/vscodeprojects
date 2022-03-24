@@ -23,11 +23,11 @@ public class CalibrateHood extends CommandBase {
   @Override
   public void execute() {
     if (m_shooter.isBackLimitSwitchTriggered()){
-      m_shooter.moveHood(.5);
-    }
-    else{
       m_shooter.moveHood(0);
       m_shooter.zeroEncoderOfHood();
+    }
+    else{
+      m_shooter.moveHood(.1);
     }
   }
 
