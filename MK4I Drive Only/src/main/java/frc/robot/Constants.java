@@ -39,7 +39,7 @@ public final class Constants {
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1; // FIXME Set front left module drive motor ID
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; // FIXME Set front left module steer motor ID
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 9; // FIXME Set front left steer encoder ID
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(187); // FIXME Measure and set front left steer offset
+    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(188.7); // FIXME Measure and set front left steer offset
 
     public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3; // FIXME Set front right drive motor ID
     public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4; // FIXME Set front right steer motor ID
@@ -118,12 +118,13 @@ public static final class swerve {
         public static final class follower {
         
             private static final double MAX_ANG_VEL_RAD_AUTO = .4 * Math.PI; //.25
+            private static final double MAX_ANG_VEL_RAD_AUTO_3rdPath = .001 * Math.PI; //.25
             public static final TrapezoidProfile.Constraints ROT_PROFILE = new TrapezoidProfile.Constraints(
                     MAX_ANG_VEL_RAD_AUTO, swerve.MAX_ANG_ACCEL);
                 // x distance PID controller
-            public static final PIDController X_PID_CONTROLLER = new PIDController(1.5, 0, 0); // 5
+            public static final PIDController X_PID_CONTROLLER = new PIDController(5, 0, 0); // 5
                 // y distance PID controller
-            public static final PIDController Y_PID_CONTROLLER = new PIDController(1.5, 0, 0); // 5, 0, .0 0.3, 0.4, 4
+            public static final PIDController Y_PID_CONTROLLER = new PIDController(5, 0, 0); // 5, 0, .0 0.3, 0.4, 4
                 // ROTATION (angle) PID controller
             public static final ProfiledPIDController ROT_PID_CONTROLLER = new ProfiledPIDController(-3, 0, 0, //.85 works
                     ROT_PROFILE); 
@@ -132,6 +133,8 @@ public static final class swerve {
             // MUST SET KINEMATICS, see documentation
             public static final TrajectoryConfig T_CONFIG = new TrajectoryConfig(LINEAR_VELOCITY_DEFAULT,
                     MAX_ANG_VEL_RAD_AUTO);
+            public static final TrajectoryConfig T_CONFIG_3rdPath = new TrajectoryConfig(LINEAR_VELOCITY_DEFAULT,
+                    MAX_ANG_VEL_RAD_AUTO_3rdPath);
         }
 
         public static final class startingPos {

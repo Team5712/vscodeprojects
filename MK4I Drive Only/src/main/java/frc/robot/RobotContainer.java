@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -67,6 +69,7 @@ public class RobotContainer {
   private final XboxController m_controller1 = new XboxController(0);
   private final XboxController m_controller2 = new XboxController(1);
   private final XboxController m_testcontroller = new XboxController(2);
+  SendableChooser<String> m_chooser = new SendableChooser<>();
   private final Compressor m_compressor = new Compressor(PneumaticsModuleType.REVPH);
   private double visionCorrection;
 
@@ -80,6 +83,12 @@ public class RobotContainer {
     // Left stick Y axis -> forward and backwards movement
     // Left stick X axis -> left and right movement
     // Right stick X axis -> rotation
+    m_chooser.setDefaultOption("3 Ball Right", "3 Ball Right");
+    m_chooser.addOption("5 Ball Right", "5 Ball Right");
+    m_chooser.addOption("Nothing", "Nothing");
+    m_chooser.addOption("2 Ball Left", "2 Ball Left");
+    m_chooser.addOption("Straight", "Straight");
+    SmartDashboard.putData(m_chooser);
 
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
@@ -151,8 +160,8 @@ public class RobotContainer {
     //Auto deep shot -8.2, 16000
 
     new Button(m_controller2::getXButton)
-  // No requirements because we don't need to interrupt anything
-    .whenHeld(new ShootCustom(m_shooter, m_magazine,14000,-8.2));
+    .whenHeld(new PickUpBall(m_intake, m_magazine));
+  // No requirements because we don't need to interrupt anything.w
     // .toggleWhenPressed(new CustomHoodAngle(m_shooter, -8.2));
 
   new Button(m_controller2::getYButton)
@@ -231,39 +240,64 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-
+    String autonChosen = m_chooser.getSelected();
     m_shooter.zeroEncoderOfHood();
     m_drivetrainSubsystem.zeroGyroscope();
 // 1. Create trajectory settings
 TrajectoryConfig trajectoryConfig = Constants.auto.follower.T_CONFIG;
+TrajectoryConfig trajectoryConfig3rdPath = Constants.auto.follower.T_CONFIG_3rdPath;
+
+Trajectory trajectoryStraight = TrajectoryGenerator.generateTrajectory(
+  new Pose2d(-.7, 0, new Rotation2d(-10)),
+  List.of(
+          new Translation2d(-.2, .5),
+          new Translation2d(.1, .8)),
+  new Pose2d(.2, 1.7, Rotation2d.fromDegrees(-55)),
+  trajectoryConfig);
+
+Trajectory trajectoryLeft1 = TrajectoryGenerator.generateTrajectory(
+  new Pose2d(0, 0, new Rotation2d(0)),
+  List.of(
+          new Translation2d(-.5, 0),
+          new Translation2d(-.75, 0)),
+  new Pose2d(-1, 0, Rotation2d.fromDegrees(10)),
+  trajectoryConfig);
+
+  Trajectory trajectoryLeft2 = TrajectoryGenerator.generateTrajectory(
+    new Pose2d(-1, 0, new Rotation2d(10)),
+    List.of(
+            new Translation2d(-.3, .75),
+            new Translation2d(.2, 1.5)),
+    new Pose2d(0.35, 1.75, Rotation2d.fromDegrees(-70)), //.4 2.15
+    trajectoryConfig);
 
 // 2. Generate trajectory
 Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
   new Pose2d(0, 0, new Rotation2d(0)),
   List.of(
-          new Translation2d(-.5, 0),
-          new Translation2d(-.75, 0)),
-  new Pose2d(-1, 0, Rotation2d.fromDegrees(-10)),
+          new Translation2d(-.3, 0),
+          new Translation2d(-.5, 0)),
+  new Pose2d(-.7, 0, Rotation2d.fromDegrees(-10)),
   trajectoryConfig);
 
   Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-  new Pose2d(-1, 0, new Rotation2d(-10)),
+  new Pose2d(-.7, 0, new Rotation2d(-10)),
   List.of(
-          new Translation2d(-.3, .75),
-          new Translation2d(.2, 1.5)),
-  new Pose2d(0.35, 1.75, Rotation2d.fromDegrees(-70)), //.4 2.15
+          new Translation2d(-.2, .5),
+          new Translation2d(.1, .8)),
+  new Pose2d(.2, 1.7, Rotation2d.fromDegrees(-55)), //.4 2.15 .35 1.75
   trajectoryConfig);
 
   Trajectory trajectory3 = TrajectoryGenerator.generateTrajectory(
-  new Pose2d(0, 0, new Rotation2d(-70)), //.35 1.75
+  new Pose2d(0, 0, new Rotation2d(-65)), //.35 1.75
   List.of(
           new Translation2d(-.9 * .3, 2.5 * .3),
           new Translation2d(-.9 * .6, 2.5 * .6)),
           //Closer to tower decrease 5.5
           //Closer to middle of field increase -.5
   //5.6 worked then ran into wall I suggest lowering it by 1 and tuning from there
-  new Pose2d(-0.9, 2.5, Rotation2d.fromDegrees(-70)),
-  trajectoryConfig);
+  new Pose2d(-0.9, 2.5, Rotation2d.fromDegrees(-65)),
+  trajectoryConfig3rdPath);
 
 
 // 3. Define PID controllers for tracking trajectory
@@ -272,6 +306,35 @@ PIDController yController = Constants.auto.follower.Y_PID_CONTROLLER;
 ProfiledPIDController thetaController = Constants.auto.follower.ROT_PID_CONTROLLER;
 thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
+SwerveControllerCommand swerveControllerCommandStraight = new SwerveControllerCommand(
+  trajectoryStraight,
+  m_drivetrainSubsystem::getPose2d,
+  m_drivetrainSubsystem.getKinematics(),
+  xController,
+  yController,
+  thetaController,
+  m_drivetrainSubsystem::setAllStates,
+  m_drivetrainSubsystem);
+
+SwerveControllerCommand swerveControllerCommandLeft1 = new SwerveControllerCommand(
+  trajectoryLeft1,
+  m_drivetrainSubsystem::getPose2d,
+  m_drivetrainSubsystem.getKinematics(),
+  xController,
+  yController,
+  thetaController,
+  m_drivetrainSubsystem::setAllStates,
+  m_drivetrainSubsystem);
+
+  SwerveControllerCommand swerveControllerCommandLeft2 = new SwerveControllerCommand(
+  trajectoryLeft2,
+  m_drivetrainSubsystem::getPose2d,
+  m_drivetrainSubsystem.getKinematics(),
+  xController,
+  yController,
+  thetaController,
+  m_drivetrainSubsystem::setAllStates,
+  m_drivetrainSubsystem);
 // 4. Construct command to follow trajectory
 SwerveControllerCommand swerveControllerCommand1 = new SwerveControllerCommand(
   trajectory1,
@@ -311,57 +374,31 @@ SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
   //   new InstantCommand(() -> m_drivetrainSubsystem.stopModules())
   //   );
 
-  // 3 Ball
-  // m_shooter.moveHood(0);
-  // m_shooter.stop();
-  // m_magazine.runUpperMag(0);
-  // return new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4).alongWith(
-  //   new SequentialCommandGroup(
-  //   new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
-  //   swerveControllerCommand1,
-  //   new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-  //   new AutoShootCommand(m_magazine, m_shooter, 11500),
-  //   new WaitCommand(2),
-  //   new AutoShootCommand(m_magazine, m_shooter, 11500),
-  //   new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
-  //   swerveControllerCommand2,
-  //   new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-  //   new WaitCommand(1),
-  //   new AutoShootCommand(m_magazine, m_shooter, 11500)));
-
-//5 ball
-  // m_shooter.moveHood(0);
-  // m_shooter.stop();
-  // m_magazine.runUpperMag(0);
-  // return new ParallelRaceGroup(
-  //   new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4),
-  //   new SequentialCommandGroup(
-  //     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
-  //     swerveControllerCommand1,
-  //     new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-  //     new AutoShootCommand(m_magazine, m_shooter, 11500),
-  //     new WaitCommand(1),
-  //     new AutoShootCommand(m_magazine, m_shooter, 11500),
-  //     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
-  //     swerveControllerCommand2,
-  //     new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-  //     new WaitCommand(1),
-  //     new AutoShootCommand(m_magazine, m_shooter, 11500))).andThen(
-  //     new AutoPickUpBall(m_intake, m_magazine, m_shooter,16000,-8.2).alongWith(new SequentialCommandGroup(
-  //     new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory3.getInitialPose())),
-  //     swerveControllerCommand3, 
-  //     new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-  //     new WaitCommand(1),
-  //     new AutoShootCommand(m_magazine, m_shooter, 16000),
-  //     new WaitCommand(1),
-  //     new AutoShootCommand(m_magazine, m_shooter, 16000) 
-  //   )));
-
-  m_shooter.moveHood(0);
-  m_shooter.stop();
-  m_magazine.runUpperMag(0);
-  return new SequentialCommandGroup(
-    new ParallelRaceGroup(
+  
+  // 3 Ball Right
+  if (autonChosen == "3 Ball Right") {
+    m_shooter.moveHood(0);
+    m_shooter.stop();
+    m_magazine.runUpperMag(0);
+    return new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4).alongWith(
+    new SequentialCommandGroup(
+    new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
+    swerveControllerCommand1,
+    new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+    new AutoShootCommand(m_magazine, m_shooter, 11500),
+    new WaitCommand(2),
+    new AutoShootCommand(m_magazine, m_shooter, 11500),
+    new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
+    swerveControllerCommand2,
+    new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+    new WaitCommand(1),
+    new AutoShootCommand(m_magazine, m_shooter, 11500)));
+  }
+  else if (autonChosen == "5 Ball Right") {
+    m_shooter.moveHood(0);
+    m_shooter.stop();
+    m_magazine.runUpperMag(0);
+    return new ParallelRaceGroup(
       new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4),
       new SequentialCommandGroup(
         new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
@@ -374,12 +411,8 @@ SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
         swerveControllerCommand2,
         new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
         new WaitCommand(1),
-        new AutoShootCommand(m_magazine, m_shooter, 11500)
-      )
-    ),
-    new ParallelCommandGroup(
-      new AutoPickUpBall(m_intake, m_magazine, m_shooter,16000,-8.2),
-      new SequentialCommandGroup(
+        new AutoShootCommand(m_magazine, m_shooter, 11500))).andThen(
+        new AutoPickUpBall(m_intake, m_magazine, m_shooter,16000,-8.2).alongWith(new SequentialCommandGroup(
         new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory3.getInitialPose())),
         swerveControllerCommand3, 
         new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
@@ -387,15 +420,79 @@ SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
         new AutoShootCommand(m_magazine, m_shooter, 16000),
         new WaitCommand(1),
         new AutoShootCommand(m_magazine, m_shooter, 16000) 
-      )
-    )
-  );
+      )));
+  }
+      // 2 Ball Left
+else if (autonChosen == "2 Ball Left") {
+    m_shooter.moveHood(0);
+    m_shooter.stop();
+    m_magazine.runUpperMag(0);
+    return new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4).alongWith(
+      new SequentialCommandGroup(
+      new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectoryLeft1.getInitialPose())),
+      swerveControllerCommandLeft1,
+      new InstantCommand(() -> m_drivetrainSubsystem.stopModules())),
+      new AutoShootCommand(m_magazine, m_shooter, 11500),
+      new WaitCommand(2),
+      new AutoShootCommand(m_magazine, m_shooter, 11500),
+      new WaitCommand(2),
+      new AutoShootCommand(m_magazine, m_shooter, 11500));
+  }
+  else if (autonChosen == "Straight") {
+    System.out.println("STRAIGHT");
+   return new SequentialCommandGroup(
+      new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectoryStraight.getInitialPose())),
+      swerveControllerCommandStraight);
+  }
+else {
+  return null;
+}
+  
+  
+
+//5 ball
+
+}
+  
+
+  // m_shooter.moveHood(0);
+  // m_shooter.stop();
+  // m_magazine.runUpperMag(0);
+  // return new SequentialCommandGroup(
+  //   new ParallelRaceGroup(
+  //     new AutoPickUpBall(m_intake, m_magazine, m_shooter,11500,-4),
+  //     new SequentialCommandGroup(
+  //       new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
+  //       swerveControllerCommand1,
+  //       new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+  //       new AutoShootCommand(m_magazine, m_shooter, 11500),
+  //       new WaitCommand(1),
+  //       new AutoShootCommand(m_magazine, m_shooter, 11500),
+  //       new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
+  //       swerveControllerCommand2,
+  //       new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+  //       new WaitCommand(1),
+  //       new AutoShootCommand(m_magazine, m_shooter, 11500)
+  //     )
+  //   ),
+  //   new ParallelCommandGroup(
+  //     new AutoPickUpBall(m_intake, m_magazine, m_shooter,16000,-8.2),
+  //     new SequentialCommandGroup(
+  //       new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory3.getInitialPose())),
+  //       swerveControllerCommand3, 
+  //       new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+  //       new WaitCommand(1),
+  //       new AutoShootCommand(m_magazine, m_shooter, 16000),
+  //       new WaitCommand(1),
+  //       new AutoShootCommand(m_magazine, m_shooter, 16000) 
+  //     )
+  //   )
+  // );
     
 
   // return new AutoPickUpBall(m_intake, m_magazine);
 
 // 5. Add some init and wrap-up, and return everything
-}
 
 
   // Testing

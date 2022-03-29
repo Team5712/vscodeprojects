@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -93,6 +94,7 @@ private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
 
   public DrivetrainSubsystem() {
     ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
+
 
     // There are 4 methods you can call to create your swerve modules.
     // The method you use depends on what motors you are using.
@@ -207,6 +209,7 @@ private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
 
   @Override
   public void periodic() {
+          System.out.print("POSE: " + getPose2d());
         m_odometry.update(getGyroscopeRotation(), getState(m_frontLeftModule) , getState(m_frontRightModule), getState(m_backLeftModule),
         getState(m_backRightModule));
 
