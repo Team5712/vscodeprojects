@@ -72,10 +72,10 @@ public class RobotContainer {
 
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         m_drivetrainSubsystem,
-        () -> -modifyAxis(m_controller1.getLeftY()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-        () -> -modifyAxis(m_controller1.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+        () -> -modifyAxis(m_controller1.getLeftY() * Constants.swerve.MAX_VEL_METERS),
+        () -> -modifyAxis(m_controller1.getLeftX() * Constants.swerve.MAX_VEL_METERS),
         () -> -modifyAxis(-m_controller1.getRightX() + m_limelight.turnToTarget())
-            * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND));
+            * Constants.swerve.MAX_ANG_ACCEL));
 
     m_compressor.enableAnalog(115, 120);
     configureButtonBindings();

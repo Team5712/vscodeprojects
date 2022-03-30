@@ -70,7 +70,7 @@ public class StraightPath extends SequentialCommandGroup {
       //       thetaController,
       //       m_drivetrainSubsystem::setAllStates,
       //       m_drivetrainSubsystem)
-            new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -4).alongWith(
+            new AutoPickUpBall(m_intake, m_magazine, m_shooter, 16000, -4).alongWith(
             new SequentialCommandGroup(
                 new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectoryStraight.getInitialPose())),
                 new SwerveControllerCommand(

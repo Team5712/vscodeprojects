@@ -50,17 +50,17 @@ public class ThreeBallRight extends SequentialCommandGroup {
     Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, new Rotation2d(0)),
         List.of(
-            new Translation2d(-.3, 0),
-            new Translation2d(-.5, 0)),
-        new Pose2d(-.7, 0, Rotation2d.fromDegrees(-10)),
+            new Translation2d(-.2, 0),
+            new Translation2d(-.4, 0)),
+        new Pose2d(-.6, 0, Rotation2d.fromDegrees(-10)),
         trajectoryConfig);
 
     Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(-.7, 0, new Rotation2d(-10)),
+        new Pose2d(-.6, 0, new Rotation2d(-10)),
         List.of(
-            new Translation2d(-.2, .5),
-            new Translation2d(.1, .8)),
-        new Pose2d(.2, 1.7, Rotation2d.fromDegrees(-55)), // .4 2.15 .35 1.75
+            new Translation2d(.2, .2),
+            new Translation2d(.4, .8)),
+        new Pose2d(.6, 1.7, Rotation2d.fromDegrees(-60)), // .4 2.15 .35 1.75
         trajectoryConfig);
 
     PIDController xController = Constants.auto.follower.X_PID_CONTROLLER;
@@ -91,7 +91,7 @@ public class ThreeBallRight extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-     new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -4).alongWith(
+     new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -4).raceWith(
             new SequentialCommandGroup(
                 new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
                 swerveControllerCommand1,

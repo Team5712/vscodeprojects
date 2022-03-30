@@ -93,7 +93,7 @@ public static final class swerve {
 
         public static final double MAX_VOLTAGE = 12; // 12 
 
-        public static final double MAX_ANG_ACCEL = 1 * Math.PI; //.5
+        public static final double MAX_ANG_ACCEL = MAX_VEL_METERS / Math.hypot(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0);
         public static final boolean feildRelativeOn = true;
         public static final boolean brakeModeOn = true;
         
