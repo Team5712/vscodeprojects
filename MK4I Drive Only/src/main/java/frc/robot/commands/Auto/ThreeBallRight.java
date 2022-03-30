@@ -35,75 +35,109 @@ public class ThreeBallRight extends SequentialCommandGroup {
     private Intake m_intake;
     private Magazine m_magazine;
 
-  /** Creates a new FiveBallRight. */
-  public ThreeBallRight(Shooter shooter, DrivetrainSubsystem drivetrainSubsystem, Intake intake, Magazine magazine) {
-    m_shooter = shooter;
-    m_drivetrainSubsystem = drivetrainSubsystem;
-    m_intake = intake;
-    m_magazine = magazine;
+    /** Creates a new FiveBallRight. */
+    public ThreeBallRight(Shooter shooter, DrivetrainSubsystem drivetrainSubsystem, Intake intake, Magazine magazine) {
+        m_shooter = shooter;
+        m_drivetrainSubsystem = drivetrainSubsystem;
+        m_intake = intake;
+        m_magazine = magazine;
 
-    m_shooter.zeroEncoderOfHood();
-    m_drivetrainSubsystem.zeroGyroscope();
+        m_shooter.zeroEncoderOfHood();
+        m_drivetrainSubsystem.zeroGyroscope();
 
-    TrajectoryConfig trajectoryConfig = Constants.auto.follower.T_CONFIG;
+        TrajectoryConfig trajectoryConfig = Constants.auto.follower.T_CONFIG;
 
-    Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, new Rotation2d(0)),
-        List.of(
-            new Translation2d(-.2, 0),
-            new Translation2d(-.4, 0)),
-        new Pose2d(-.6, 0, Rotation2d.fromDegrees(-10)),
-        trajectoryConfig);
+        Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
+                new Pose2d(0, 0, new Rotation2d(0)),
+                List.of(
+                        new Translation2d(-.2, 0),
+                        new Translation2d(-.4, 0)),
+                new Pose2d(-.6, 0, Rotation2d.fromDegrees(-10)),
+                trajectoryConfig);
 
-    Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(-.6, 0, new Rotation2d(-10)),
-        List.of(
-            new Translation2d(.2, .2),
-            new Translation2d(.4, .8)),
-        new Pose2d(.6, 1.7, Rotation2d.fromDegrees(-60)), // .4 2.15 .35 1.75
-        trajectoryConfig);
+        Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
+                new Pose2d(-.6, 0, new Rotation2d(-10)),
+                List.of(
+                        new Translation2d(.2, .2),
+                        new Translation2d(.4, .8)),
+                new Pose2d(.6, 1.7, Rotation2d.fromDegrees(-60)), // .4 2.15 .35 1.75
+                trajectoryConfig);
 
-    PIDController xController = Constants.auto.follower.X_PID_CONTROLLER;
-    PIDController yController = Constants.auto.follower.Y_PID_CONTROLLER;
-    ProfiledPIDController thetaController = Constants.auto.follower.ROT_PID_CONTROLLER;
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        Trajectory trajectory3 = TrajectoryGenerator.generateTrajectory(
+                new Pose2d(.6, 1.7, new Rotation2d(-60)), // .35 1.75
+                List.of(
+                        new Translation2d(.4, 2),
+                        new Translation2d(.2, 2.5)),
+                // Closer to tower decrease 5.5
+                // Closer to middle of field increase -.5
+                // 5.6 worked then ran into wall I suggest lowering it by 1 and tuning from
+                // there
+                new Pose2d(0, 3, Rotation2d.fromDegrees(-65)),
+                trajectoryConfig);
 
-    SwerveControllerCommand swerveControllerCommand1 = new SwerveControllerCommand(
-      trajectory1,
-      m_drivetrainSubsystem::getPose2d,
-      m_drivetrainSubsystem.getKinematics(),
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::setAllStates,
-      m_drivetrainSubsystem);
+        PIDController xController = Constants.auto.follower.X_PID_CONTROLLER;
+        PIDController yController = Constants.auto.follower.Y_PID_CONTROLLER;
+        ProfiledPIDController thetaController = Constants.auto.follower.ROT_PID_CONTROLLER;
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-  SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
-      trajectory2,
-      m_drivetrainSubsystem::getPose2d,
-      m_drivetrainSubsystem.getKinematics(),
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::setAllStates,
-      m_drivetrainSubsystem);
+        SwerveControllerCommand swerveControllerCommand1 = new SwerveControllerCommand(
+                trajectory1,
+                m_drivetrainSubsystem::getPose2d,
+                m_drivetrainSubsystem.getKinematics(),
+                xController,
+                yController,
+                thetaController,
+                m_drivetrainSubsystem::setAllStates,
+                m_drivetrainSubsystem);
 
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
-    addCommands(
-     new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -4).raceWith(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
-                swerveControllerCommand1,
-                new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-                new AutoShootCommand(m_magazine, m_shooter, 11500),
-                new WaitCommand(2),
-                new AutoShootCommand(m_magazine, m_shooter, 11500),
-                new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
-                swerveControllerCommand2,
-                new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
-                new WaitCommand(1),
-                new AutoShootCommand(m_magazine, m_shooter, 11500)))
-    );
-  }
+        SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
+                trajectory2,
+                m_drivetrainSubsystem::getPose2d,
+                m_drivetrainSubsystem.getKinematics(),
+                xController,
+                yController,
+                thetaController,
+                m_drivetrainSubsystem::setAllStates,
+                m_drivetrainSubsystem);
+
+        SwerveControllerCommand swerveControllerCommand3 = new SwerveControllerCommand(
+                trajectory3,
+                m_drivetrainSubsystem::getPose2d,
+                m_drivetrainSubsystem.getKinematics(),
+                xController,
+                yController,
+                thetaController,
+                m_drivetrainSubsystem::setAllStates,
+                m_drivetrainSubsystem);
+
+        // Add your commands in the addCommands() call, e.g.
+        // addCommands(new FooCommand(), new BarCommand());
+        addCommands(
+                new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -4).raceWith(
+                        new SequentialCommandGroup(
+                                new InstantCommand(
+                                        () -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
+                                swerveControllerCommand1,
+                                new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+                                new AutoShootCommand(m_magazine, m_shooter, 11500),
+                                new WaitCommand(2),
+                                new AutoShootCommand(m_magazine, m_shooter, 11500),
+                                new InstantCommand(
+                                        () -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
+                                swerveControllerCommand2,
+                                new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+                                new WaitCommand(1),
+                                new AutoShootCommand(m_magazine, m_shooter, 11500)))
+                        .andThen(
+                                new AutoPickUpBall(m_intake, m_magazine, m_shooter, 16000, -8.2)
+                                        .raceWith(new SequentialCommandGroup(
+                                                new InstantCommand(() -> m_drivetrainSubsystem
+                                                        .resetOdometry(trajectory3.getInitialPose())),
+                                                swerveControllerCommand3,
+                                                new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
+                                                new WaitCommand(1),
+                                                new AutoShootCommand(m_magazine, m_shooter, 16000),
+                                                new WaitCommand(1),
+                                                new AutoShootCommand(m_magazine, m_shooter, 16000)))));
+    }
 }
