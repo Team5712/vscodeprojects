@@ -62,7 +62,7 @@ public class RobotContainer {
   public RobotContainer() {
     threeBallRight = new ThreeBallRight(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
     fiveBallRight = new FiveBallRight(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
-    straightPath = new StraightPath(m_shooter, m_drivetrainSubsystem);
+    straightPath = new StraightPath(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
 
 
     m_chooser.setDefaultOption("3 Ball Right", threeBallRight);

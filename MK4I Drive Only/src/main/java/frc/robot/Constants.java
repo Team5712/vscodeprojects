@@ -91,7 +91,7 @@ public static final class swerve {
 
 //12
 
-        public static final double MAX_VOLTAGE = 10; // 12 
+        public static final double MAX_VOLTAGE = 12; // 12 
 
         public static final double MAX_ANG_ACCEL = 1 * Math.PI; //.5
         public static final boolean feildRelativeOn = true;
