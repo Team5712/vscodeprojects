@@ -41,6 +41,7 @@ import frc.robot.commands.Auto.FiveBallRight;
 import frc.robot.commands.Auto.RunBasicTrajectory;
 import frc.robot.commands.Auto.StraightPath;
 import frc.robot.commands.Auto.ThreeBallRight;
+import frc.robot.commands.Auto.TwoBallLeft;
 
 public class RobotContainer {
   private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
@@ -58,14 +59,17 @@ public class RobotContainer {
   private ThreeBallRight threeBallRight;
   private FiveBallRight fiveBallRight;
   private StraightPath straightPath;
+  private TwoBallLeft twoBallLeft;
 
   public RobotContainer() {
     threeBallRight = new ThreeBallRight(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
     fiveBallRight = new FiveBallRight(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
     straightPath = new StraightPath(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
+    twoBallLeft = new TwoBallLeft(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
 
 
     m_chooser.setDefaultOption("3 Ball Right", threeBallRight);
+    m_chooser.addOption("Two Ball Left", twoBallLeft);
     m_chooser.addOption("5 Ball Right", fiveBallRight);
     m_chooser.addOption("Straight", straightPath);
     SmartDashboard.putData(m_chooser);
