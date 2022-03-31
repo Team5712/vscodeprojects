@@ -119,7 +119,8 @@ public class RobotContainer {
         .whenHeld(new CalibrateHood(m_shooter));
     // Adjust hood, rpm, and shoot ball from tarmac
     new Button(m_controller2::getRightBumper)
-        .whenHeld(new ShootCustom(m_shooter, m_magazine, 11500, -3));
+        // .whenHeld(new ShootCustom(m_shooter, m_magazine, 16000, -9.2));
+        .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight));
     // Pick up ball without intake
     new Button(m_controller2::getXButton)
         .whenHeld(new PickUpBallNoIntake(m_magazine));
