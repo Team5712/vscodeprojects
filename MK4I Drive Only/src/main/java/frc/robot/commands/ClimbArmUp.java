@@ -61,7 +61,7 @@ public class ClimbArmUp extends CommandBase {
   @Override
   public boolean isFinished() {
     // return armsUp;
-    return false;
+    return m_climber.getLimitSwitchLeftUp();
 
   }
 }
