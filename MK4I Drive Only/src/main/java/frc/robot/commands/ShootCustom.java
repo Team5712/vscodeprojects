@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Magazine;
 import frc.robot.subsystems.Shooter;
 
@@ -20,12 +21,14 @@ public class ShootCustom extends CommandBase {
   private Magazine m_magazine;
   private double m_RPM;
   private double m_setHoodAngle;
+  private Limelight m_limelight;
   private final Timer timer = new Timer();
 
-  public ShootCustom(Shooter shooter, Magazine magazine, double RPM, double setHoodAngle) {
+  public ShootCustom(Shooter shooter, Magazine magazine, double RPM, double setHoodAngle, Limelight limelight) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = shooter;
     m_magazine = magazine;
+    m_limelight = limelight;
     m_setHoodAngle = setHoodAngle;
     m_RPM = RPM;
     
@@ -38,6 +41,12 @@ public class ShootCustom extends CommandBase {
     timer.reset();
     timer.start();
   }
+
+
+  //Limelight mode - if there is one or more balls in the robot and it
+
+
+
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -63,6 +72,7 @@ public class ShootCustom extends CommandBase {
         m_magazine.runUpperMag(0);   
       }
     }
+    
 
   }
 

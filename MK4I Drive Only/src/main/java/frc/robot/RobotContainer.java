@@ -116,7 +116,7 @@ public class RobotContainer {
         .whenHeld(new TurnToTarget(m_limelight));
 
     new Button(m_controller1::getXButton)
-    .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight));
+    .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
 
     // *********************************
     // SECONDARY DRIVER: M_CONTROLLER2
@@ -126,17 +126,17 @@ public class RobotContainer {
         .whenHeld(new CalibrateHood(m_shooter));
     // Adjust hood, rpm, and shoot ball from tarmac
     new Button(m_controller2::getRightBumper)
-        .whenHeld(new ShootCustom(m_shooter, m_magazine, 11500, -3));
-        // .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight));
+        //.whenHeld(new ShootCustom(m_shooter, m_magazine, 15500, -9.5, m_limelight));
+        .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
     // Pick up ball without intake
     new Button(m_controller2::getXButton)
         .whenHeld(new PickUpBallNoIntake(m_magazine));
     // Adjust hood, rpm, and shoot ball in low goal
     new Button(m_controller2::getYButton)
-        .whenHeld(new ShootCustom(m_shooter, m_magazine, 6000, -5));
-    // Adjust hood, rpm, and shoot ball from close safe zone
+        .whenHeld(new ShootCustom(m_shooter, m_magazine, 6000, -5, m_limelight));
+    // Adjust hood, rpm, and shoot ball from close $safe zone
     new Button(m_controller2::getBButton)
-        .whenHeld(new ShootCustom(m_shooter, m_magazine, 13000, -6));
+        .whenHeld(new ShootCustom(m_shooter, m_magazine, 13000, -6, m_limelight));
     // force magazine up
     new Button(m_controller2::getLeftBumper)
         .whenActive(() -> {

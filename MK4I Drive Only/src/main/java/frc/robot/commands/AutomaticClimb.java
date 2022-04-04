@@ -4,33 +4,25 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Climber;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class AutomaticClimb extends SequentialCommandGroup {
-  /** Creates a new AutomaticClimb. */
   public AutomaticClimb(Climber climber) {
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         new SequentialCommandGroup(
             new ClimbArmDown(climber),
-            new WaitCommand(2),
-            new ParallelCommandGroup(
-                new ClimbArmUp(climber),
-                new SequentialCommandGroup(
-                    new WaitCommand(0.5),
-                    new ClimbArmsOut(climber))),
-            new WaitCommand(1),
-            new ParallelCommandGroup(
+            new WaitCommand(0.5),
+            new SequentialCommandGroup(
+                new ClimbArmUp6in(climber),
+                new WaitCommand(0.5),
+                new ClimbArmsOut(climber),
+                // new WaitCommand(0.5),
+                new ClimbArmUp(climber)),
+            new SequentialCommandGroup(
                 new ClimbArmsIn(climber),
-                new ClimbArmDown(climber)
-            )));
+                new WaitCommand(1),
+                new ClimbArmDown(climber))));
   }
 }
