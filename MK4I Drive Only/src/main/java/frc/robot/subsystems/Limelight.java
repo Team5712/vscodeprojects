@@ -64,7 +64,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public boolean alignGood() {
-    if (tx.getDouble(0.0) > -3 && tx.getDouble(0.0) < 3) {
+    if (tx.getDouble(0.0) > -1 && tx.getDouble(0.0) < 1) {
       return true;
     } else {
       return false;

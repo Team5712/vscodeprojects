@@ -118,7 +118,6 @@ public static final class swerve {
         public static final class follower {
         
             private static final double MAX_ANG_VEL_RAD_AUTO = .4 * Math.PI; //.25
-            private static final double MAX_ANG_VEL_RAD_AUTO_3rdPath = .001 * Math.PI; //.25
             public static final TrapezoidProfile.Constraints ROT_PROFILE = new TrapezoidProfile.Constraints(
                     MAX_ANG_VEL_RAD_AUTO, swerve.MAX_ANG_ACCEL);
                 // x distance PID controller
@@ -133,8 +132,8 @@ public static final class swerve {
             // MUST SET KINEMATICS, see documentation
             public static final TrajectoryConfig T_CONFIG = new TrajectoryConfig(LINEAR_VELOCITY_DEFAULT,
                     MAX_ANG_VEL_RAD_AUTO);
-            public static final TrajectoryConfig T_CONFIG_3rdPath = new TrajectoryConfig(LINEAR_VELOCITY_DEFAULT,
-                    MAX_ANG_VEL_RAD_AUTO_3rdPath);
+            public static final TrajectoryConfig T_CONFIG_3rdPath = new TrajectoryConfig(LINEAR_VELOCITY_DEFAULT/2,
+                    MAX_ANG_VEL_RAD_AUTO/2);
         }
 
         public static final class startingPos {

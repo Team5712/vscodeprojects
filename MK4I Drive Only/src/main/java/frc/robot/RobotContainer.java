@@ -37,6 +37,7 @@ import frc.robot.subsystems.Magazine;
 import frc.robot.subsystems.Shooter;
 import frc.robot.Constants.auto.follower;
 import frc.robot.commands.*;
+import frc.robot.commands.Auto.FancyTwoBallLeft;
 import frc.robot.commands.Auto.FiveBallRight;
 import frc.robot.commands.Auto.RunBasicTrajectory;
 import frc.robot.commands.Auto.StraightPath;
@@ -60,15 +61,18 @@ public class RobotContainer {
   private FiveBallRight fiveBallRight;
   private StraightPath straightPath;
   private TwoBallLeft twoBallLeft;
+  private FancyTwoBallLeft fancyTwoBallLeft;
 
   public RobotContainer() {
     threeBallRight = new ThreeBallRight(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
     fiveBallRight = new FiveBallRight(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
     straightPath = new StraightPath(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
     twoBallLeft = new TwoBallLeft(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
+    fancyTwoBallLeft = new FancyTwoBallLeft(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
 
 
     m_chooser.setDefaultOption("3 Ball Right", threeBallRight);
+    m_chooser.addOption("Fancy Two Ball Left", fancyTwoBallLeft);
     m_chooser.addOption("Two Ball Left", twoBallLeft);
     m_chooser.addOption("5 Ball Right", fiveBallRight);
     m_chooser.addOption("Straight", straightPath);
@@ -115,8 +119,10 @@ public class RobotContainer {
     new Button(m_controller1::getYButton)
         .whenHeld(new TurnToTarget(m_limelight));
 
-    new Button(m_controller1::getXButton)
-    .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
+    // new Button(m_controller1::getYButton)
+    //     .toggleWhenPressed(new TurnToTarget(m_limelight));
+
+    
 
     // *********************************
     // SECONDARY DRIVER: M_CONTROLLER2
@@ -124,10 +130,12 @@ public class RobotContainer {
     // run hood to limit switch and reset encoder
     new Button(m_controller2::getAButton)
         .whenHeld(new CalibrateHood(m_shooter));
-    // Adjust hood, rpm, and shoot ball from tarmac
+    // // Adjust hood, rpm, and shoot ball from tarmac
+    // new Button(m_controller2::getRightBumper)
+    // .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
     new Button(m_controller2::getRightBumper)
-        //.whenHeld(new ShootCustom(m_shooter, m_magazine, 15500, -9.5, m_limelight));
-        .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
+        // .whenHeld(new ShootCustom(m_shooter, m_magazine,11500,-3, m_limelight));
+       .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
     // Pick up ball without intake
     new Button(m_controller2::getXButton)
         .whenHeld(new PickUpBallNoIntake(m_magazine));
