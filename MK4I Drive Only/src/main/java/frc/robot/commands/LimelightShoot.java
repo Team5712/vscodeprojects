@@ -56,10 +56,10 @@ public class LimelightShoot extends CommandBase {
       if (m_shooter.leftSpeed() < m_RPM * 1.1 && m_shooter.leftSpeed() > m_RPM * 0.9) {
         if (m_magazine.getUpperBallSensor() < Constants.UPPER_BALL_SENSOR_THRESHOLD) {
           m_magazine.runLowerMag(.3);
-          m_magazine.runUpperMag(-.3);
+          m_magazine.runUpperMag(-.4);
         } else {
           m_magazine.runLowerMag(0);
-          m_magazine.runUpperMag(-.3);
+          m_magazine.runUpperMag(-.4);
         }
 
       } else {
@@ -67,9 +67,9 @@ public class LimelightShoot extends CommandBase {
         m_magazine.runUpperMag(0);
       }
     }
-    if(m_limelight.alignGood()){
-      m_drivetrainSubsystem.defense();
-    }
+    // if(m_limelight.alignGood()){
+    //   m_drivetrainSubsystem.defense();
+    // }
   }
 
   // Called once the command ends or is interrupted.

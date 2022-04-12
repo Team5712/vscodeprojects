@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +29,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
-
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.Intake;
@@ -43,6 +44,7 @@ import frc.robot.commands.Auto.RunBasicTrajectory;
 import frc.robot.commands.Auto.StraightPath;
 import frc.robot.commands.Auto.ThreeBallRight;
 import frc.robot.commands.Auto.TwoBallLeft;
+
 
 public class RobotContainer {
   private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
@@ -62,6 +64,19 @@ public class RobotContainer {
   private StraightPath straightPath;
   private TwoBallLeft twoBallLeft;
   private FancyTwoBallLeft fancyTwoBallLeft;
+
+  /*
+  * The only info I could find was that each button the button box (since it is detected as a joystick) must be created
+  * individually instead of as a whole like the xbox controller. 
+  * 
+  * The number in the joystick initialization is the usb slot from the driver station. 
+  */
+  private final Joystick m_buttonBox = new Joystick(3);
+  JoystickButton button1 = new JoystickButton(m_buttonBox, 3);
+  JoystickButton button2 = new JoystickButton(m_buttonBox, 3);
+  JoystickButton button3 = new JoystickButton(m_buttonBox, 3);
+  JoystickButton button4 = new JoystickButton(m_buttonBox, 3);
+  JoystickButton button5 = new JoystickButton(m_buttonBox, 3);
 
   public RobotContainer() {
     threeBallRight = new ThreeBallRight(m_shooter, m_drivetrainSubsystem, m_intake, m_magazine);
@@ -134,8 +149,8 @@ public class RobotContainer {
     // new Button(m_controller2::getRightBumper)
     // .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
     new Button(m_controller2::getRightBumper)
-        // .whenHeld(new ShootCustom(m_shooter, m_magazine,11500,-3, m_limelight));
-       .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
+        .whenHeld(new ShootCustom(m_shooter, m_magazine,11500,-3.25, m_limelight));
+      //  .whenHeld(new LimelightShoot(m_shooter, m_magazine, m_limelight, m_drivetrainSubsystem));
     // Pick up ball without intake
     new Button(m_controller2::getXButton)
         .whenHeld(new PickUpBallNoIntake(m_magazine));
@@ -145,11 +160,11 @@ public class RobotContainer {
     // Adjust hood, rpm, and shoot ball from close $safe zone
     new Button(m_controller2::getBButton)
         .whenHeld(new ShootCustom(m_shooter, m_magazine, 13000, -6, m_limelight));
-    // force magazine up
+    // force magazine up 
     new Button(m_controller2::getLeftBumper)
         .whenActive(() -> {
-          m_magazine.runLowerMag(.5);
-          m_magazine.runUpperMag(-.5);
+          m_magazine.runLowerMag(.8);
+          m_magazine.runUpperMag(-.8);
         })
         .whenInactive(() -> {
           m_magazine.runLowerMag(0);
@@ -177,8 +192,16 @@ public class RobotContainer {
         .whenPressed(() -> m_climber.moveSolenoid(false));
     new Button(m_testcontroller::getRightBumper)
         .toggleWhenPressed(new AutomaticClimb(m_climber));
-
-  }
+  
+    /*
+    // *********************************
+    // Button Box: M_ButtonBox
+    // *********************************
+    button1.whenPressed(System.out.print("Button 1"));
+       */ 
+        
+    }
+  
 
   public Command getAutonomousCommand() {
     return m_chooser.getSelected();
@@ -198,7 +221,7 @@ public class RobotContainer {
 
   private static double modifyAxis(double value) {
     // Deadband
-    value = deadband(value, 0.05);
+    value = deadband(value, 0.1);
 
     // Square the axis
     value = Math.copySign(value * value, value);

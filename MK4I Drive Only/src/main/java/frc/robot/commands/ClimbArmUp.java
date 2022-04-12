@@ -47,12 +47,9 @@ public class ClimbArmUp extends CommandBase {
   // else {
   //   m_climber.runClimber(-.5);
   // }
-  if(timer.get()<.5){
-    m_climber.runClimber(-.5);
-  }
-  else{
-    m_climber.runClimber(-1);
-  }
+  if(timer.get()<0.25){m_climber.runClimber(-0.5);}
+  else{m_climber.runClimber(-1);}
+  
 
   SmartDashboard.putNumber("Limit Switch Up Timer", glitchyLimitSwitchTimer.get());
 
@@ -81,7 +78,7 @@ public class ClimbArmUp extends CommandBase {
   @Override
   public boolean isFinished() {
     // return armsUp;
-    if(glitchyLimitSwitchTimer.get() > 0.5) {
+    if(glitchyLimitSwitchTimer.get() > .5) {
       return m_climber.getLimitSwitchLeftUp();
     }
     return false;

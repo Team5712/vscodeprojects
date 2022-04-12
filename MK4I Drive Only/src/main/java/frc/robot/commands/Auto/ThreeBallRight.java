@@ -49,23 +49,25 @@ public class ThreeBallRight extends SequentialCommandGroup {
         TrajectoryConfig trajectoryConfig3rdPath = Constants.auto.follower.T_CONFIG_3rdPath;
 
         Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
-                new Pose2d(0, 0, new Rotation2d(0)),
+                new Pose2d(.1, 0, new Rotation2d(0)),
                 List.of(
                         new Translation2d(-.2, 0),
                         new Translation2d(-.4, 0)),
-                new Pose2d(-.6, 0, Rotation2d.fromDegrees(-10)),
+                new Pose2d(-.8, 0, Rotation2d.fromDegrees(-10)),
                 trajectoryConfig);
 
+        m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose());
+
         Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-                new Pose2d(-.6, 0, new Rotation2d(-10)),
+                new Pose2d(-.8, 0, new Rotation2d(-10)),
                 List.of(
-                        new Translation2d(.2, .2),
-                        new Translation2d(.4, .8)),
-                new Pose2d(.6, 1.7, Rotation2d.fromDegrees(-65)), // .4 2.15 .35 1.75
+                        new Translation2d(-4, .2),
+                        new Translation2d(-.2, .8)),
+                new Pose2d(0, 2.0, Rotation2d.fromDegrees(-65)), // .4 2.15 .35 1.75
                 trajectoryConfig);
 
         Trajectory trajectory3 = TrajectoryGenerator.generateTrajectory(
-                new Pose2d(.6, 1.7, new Rotation2d(-65)), // .35 1.75
+                new Pose2d(0, 2.0, new Rotation2d(-65)), // .35 1.75
                 List.of(
                         new Translation2d(.5, 2),
                         new Translation2d(.4, 2.5)),
@@ -73,7 +75,7 @@ public class ThreeBallRight extends SequentialCommandGroup {
                 // Closer to middle of field increase -.5
                 // 5.6 worked then ran into wall I suggest lowering it by 1 and tuning from
                 // there
-                new Pose2d(.05, 3.575, Rotation2d.fromDegrees(-70)),
+                new Pose2d(-.05, 3.575, Rotation2d.fromDegrees(-70)),
                 trajectoryConfig3rdPath);
 
         PIDController xController = Constants.auto.follower.X_PID_CONTROLLER;
@@ -114,7 +116,7 @@ public class ThreeBallRight extends SequentialCommandGroup {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
-                new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -4).raceWith(
+                new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -3.5).raceWith(
                         new SequentialCommandGroup(
                                 new InstantCommand(
                                         () -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
