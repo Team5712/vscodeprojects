@@ -236,10 +236,10 @@ public void stopModules() {
 }
 
 public void defense(){
-        m_frontLeftModule.set(0, 45);
-        m_frontRightModule.set(0, -45);
-        m_backLeftModule.set(0, -45);
-        m_backRightModule.set(0, 45); 
+        m_frontLeftModule.set(0, -45);
+        m_frontRightModule.set(0, 45);
+        m_backLeftModule.set(0, 45);
+        m_backRightModule.set(0, -45); 
 }
         
 }

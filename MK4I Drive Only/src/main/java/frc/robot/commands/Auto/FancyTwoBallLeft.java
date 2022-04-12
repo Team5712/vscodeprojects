@@ -52,16 +52,24 @@ public class FancyTwoBallLeft extends SequentialCommandGroup {
                 List.of(
                         new Translation2d(-.2, 0),
                         new Translation2d(-.4, 0)),
-                new Pose2d(-.6, 0, Rotation2d.fromDegrees(15)),
+                new Pose2d(-.7, 0, Rotation2d.fromDegrees(15)),
                 trajectoryConfig);
 
         Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-                        new Pose2d(-.6, 0, new Rotation2d(15)),
+                        new Pose2d(-.7, 0, new Rotation2d(15)),
                         List.of(
-                                new Translation2d(-.2, 0),
-                                new Translation2d(-.4, 0)),
-                        new Pose2d(-.57, .8, Rotation2d.fromDegrees(50)),
+                                new Translation2d(-.4, .0),
+                                new Translation2d(-.7, .2)),
+                        new Pose2d(-1.03, 1.27, Rotation2d.fromDegrees(-90)),
                         trajectoryConfig);
+
+        Trajectory trajectory3 = TrajectoryGenerator.generateTrajectory(
+                                new Pose2d(-1.03, 1.27, new Rotation2d(-90)),
+                                List.of(
+                                        new Translation2d(-1.03, 1.1),
+                                        new Translation2d(-1.03, .9)),
+                                new Pose2d(-1.03, .75, Rotation2d.fromDegrees(20)),
+                                trajectoryConfig);
 
         PIDController xController = Constants.auto.follower.X_PID_CONTROLLER;
         PIDController yController = Constants.auto.follower.Y_PID_CONTROLLER;
@@ -88,6 +96,16 @@ public class FancyTwoBallLeft extends SequentialCommandGroup {
                         m_drivetrainSubsystem::setAllStates,
                         m_drivetrainSubsystem);
 
+
+        SwerveControllerCommand swerveControllerCommand3 = new SwerveControllerCommand(
+                                trajectory3,
+                                m_drivetrainSubsystem::getPose2d,
+                                m_drivetrainSubsystem.getKinematics(),
+                                xController,
+                                yController,
+                                thetaController,
+                                m_drivetrainSubsystem::setAllStates,
+                                m_drivetrainSubsystem);
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
@@ -107,6 +125,13 @@ public class FancyTwoBallLeft extends SequentialCommandGroup {
                                         .alongWith(new InstantCommand(
                                                 () -> m_drivetrainSubsystem.resetOdometry(trajectory2.getInitialPose())),
                                 swerveControllerCommand2,
+                                new InstantCommand(() -> m_drivetrainSubsystem.stopModules())
+                                )))
+                                .andThen(new SequentialCommandGroup(
+                                        new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -4)
+                                        .alongWith(new InstantCommand(
+                                                () -> m_drivetrainSubsystem.resetOdometry(trajectory3.getInitialPose())),
+                                swerveControllerCommand3,
                                 new InstantCommand(() -> m_drivetrainSubsystem.stopModules())
                                 ))));
 

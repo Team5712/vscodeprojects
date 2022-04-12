@@ -49,28 +49,26 @@ public class ThreeBallRight extends SequentialCommandGroup {
         TrajectoryConfig trajectoryConfig3rdPath = Constants.auto.follower.T_CONFIG_3rdPath;
 
         Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
-                new Pose2d(.1, 0, new Rotation2d(0)),
+                new Pose2d(0, 0, new Rotation2d(0)),
                 List.of(
                         new Translation2d(-.2, 0),
                         new Translation2d(-.4, 0)),
-                new Pose2d(-.8, 0, Rotation2d.fromDegrees(-10)),
+                new Pose2d(-.6, 0, Rotation2d.fromDegrees(-10)),
                 trajectoryConfig);
 
-        m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose());
-
         Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-                new Pose2d(-.8, 0, new Rotation2d(-10)),
+                new Pose2d(-.6, 0, new Rotation2d(-10)),
                 List.of(
-                        new Translation2d(-4, .2),
-                        new Translation2d(-.2, .8)),
-                new Pose2d(0, 2.0, Rotation2d.fromDegrees(-65)), // .4 2.15 .35 1.75
+                        new Translation2d(0, .2),
+                        new Translation2d(.3, .8)),
+                new Pose2d(.4, 1.7, Rotation2d.fromDegrees(-65)), // .4 2.15 .35 1.75
                 trajectoryConfig);
 
         Trajectory trajectory3 = TrajectoryGenerator.generateTrajectory(
-                new Pose2d(0, 2.0, new Rotation2d(-65)), // .35 1.75
+                new Pose2d(.4, 1.7, new Rotation2d(-65)), // .35 1.75
                 List.of(
-                        new Translation2d(.5, 2),
-                        new Translation2d(.4, 2.5)),
+                        new Translation2d(.2, 2),
+                        new Translation2d(.1, 2.5)),
                 // Closer to tower decrease 5.5
                 // Closer to middle of field increase -.5
                 // 5.6 worked then ran into wall I suggest lowering it by 1 and tuning from
@@ -116,7 +114,7 @@ public class ThreeBallRight extends SequentialCommandGroup {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
-                new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -3.5).raceWith(
+                new AutoPickUpBall(m_intake, m_magazine, m_shooter, 11500, -3.25).raceWith(
                         new SequentialCommandGroup(
                                 new InstantCommand(
                                         () -> m_drivetrainSubsystem.resetOdometry(trajectory1.getInitialPose())),
@@ -139,8 +137,8 @@ public class ThreeBallRight extends SequentialCommandGroup {
                                                 swerveControllerCommand3,
                                                 new InstantCommand(() -> m_drivetrainSubsystem.stopModules()),
                                                 new WaitCommand(1),
-                                                new AutoShootCommand(m_magazine, m_shooter, 16000),
+                                                new AutoShootCommand(m_magazine, m_shooter, 16500),
                                                 new WaitCommand(1),
-                                                new AutoShootCommand(m_magazine, m_shooter, 16000)))));
+                                                new AutoShootCommand(m_magazine, m_shooter, 16500)))));
     }
 }
